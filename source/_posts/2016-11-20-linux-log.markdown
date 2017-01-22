@@ -1,0 +1,76 @@
+---
+layout: post
+title:  "linux系列--关于 linux 日志"
+date:   2016-11-20 13:06:25
+tags: linux
+---
+
+## 目录结构：
+
+[Linux日志概述](#A)
+
+[常见日志文件 ](#B)
+
+[常用命令](#C)
+
+
+
+<a name="A"></a>
+
+## Linux日志概述
+
+ - Linux 系统的日志主要分为两种类型：一种是进程所属日志，另一种是syslog的信息，即系统syslog记录的日志。
+ - Linux 日志系统可以划分为三个子系统：1，连接时间用户登录的日志，一般写入到/var/log/wtmp,/var/log/utmp两个文件中。2，进程统计日志。3错误日志，通过syslogd写入文件/var/log/message。
+ - 关于syslogd:Linux 内核由很多子系统组成，包括网络、文件访问、内存管理等。子系统需要给用户传送一些消息，这些消息内容包括消息的来源及其重要性等。所有的子系统都要把消息送到一个可以维护的公用消息区，于是就有了一个叫 syslog 的程序。它的配置文件通常位于/etc/log/syslog.conf。
+ - 关于logrotate:logrotate程序用来帮助用户管理日志文件，它以自己的守护进程工作。logrotate 周期性地旋转日志文件，可以周期性地把每个日志文件重命名成一个备份名字，然后让它的守护进程开始使用一个日志文件的新的拷贝。配置文件通常位于/etc/logrotate.conf。
+ 
+<a name="B"></a>
+
+## 常见日志文件
+
+直接引自[云服务器 ECS Linux 系统中常见的日志文件介绍](https://help.aliyun.com/knowledge_detail/41546.html)
+
+ - /var/log/cron
+可以在 cron 文件中检查 crontab 任务调度是否实际执行，执行过程是否发生错误，以及 /etc/crontab 文件是否有语法错误或编写错误。
+ 
+ - /var/log/dmesg 
+可以在 dmesg 文件中检查系统在开机时候内核检测过程所产生的各项信息，包括系统的设备信息，以及在启动和操作过程中系统记录的任何错误和问题的信息。通过 dmesg 文件可以判断某些硬件设备（比如磁盘）在系统启动过程中是否被正确识别。
+ 
+ - /var/log/lastlog 
+可以在 lastlog 文件中检查系统上面所有账号的最后一次登录系统时的相关信息。
+ 
+ - /var/log/messages 
+可以在 messages 文件中检查到绝大多数系统发生的错误信息，如果系统发生一些未知的错误，建议客户首先检查一下 messages 文件。可以通过 tail -f /var/log/messages 实时查看系统内的变化情况。iptables 的默认日志就是 /var/log/messages。 
+ 
+ - /var/log/secure
+所有涉及需要输入账号密码的软件或程序，在登陆时（无论登录成功或失败）的信息都会被记录到 secure 文件，比如系统的 login 程序；su、sudo 命令；ssh、telnet、pop3、ftp 等程序的登录信息。
+ 
+ - /var/log/wtmp
+可以在 wtmp 文件中检查到正确登陆系统的账户信息。由于 wtmp 文件已经被编码过的，所以需要使用 last 指令来取出文件的内容，用 cat 等命令无法直接查看此文件。 
+
+
+<a name="C"></a>
+
+## 常用命令
+
+ - w
+查看当前系统登录的用户以及用户在干什么
+
+ - history
+当前登录用户的执行命令历史
+
+ - last
+查看当前用户登录历史
+
+ - who /var/log/wtmp
+查看用户登录系统历史
+
+
+## 参考文章
+
+[云服务器 ECS Linux 系统中常见的日志文件介绍](https://help.aliyun.com/knowledge_detail/41546.html)
+
+[Linux系统日志简介](http://www.freeoa.net/osuport/sysadmin/linux-sys-log-intro_1862.html)
+
+
+***END***

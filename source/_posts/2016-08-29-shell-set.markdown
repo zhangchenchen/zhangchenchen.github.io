@@ -1,0 +1,79 @@
+---
+layout: post
+title:  "shell脚本系列--set 与 unset"
+date:   2016-08-29 14:24:25
+tags: shell
+---
+
+## 目录结构：
+
+[命令用途 ](#A)
+
+[常用命令参数 ](#B)
+
+[使用示例](#C)
+
+
+
+
+
+<a name="A"></a>
+
+## 命令用途 
+
+
+set 主要是显示系统中已经存在的shell变量，以及设置shell变量的新变量值。使用set更改shell特性时，符号"+"和"-"的作用分别是打开和关闭指定的模式。set命令不能够定义新的shell变量。如果要定义新的变量，可以使用declare命令以 变量名=值 的格式进行定义即可。
+
+unset 用于删除已定义的shell变量（包括环境变量）和shell函数。unset命令不能够删除具有只读属性的shell变量和环境变量。
+
+
+<a name="B"></a>
+
+## 常用命令参数
+
+set常用参数
+
+ 1. -a  标示已修改的变量，以供输出至环境变量。
+
+ 2. -b 使被中止的后台程序立刻回报执行状态。
+
+unset 常用参数
+
+1. -f 仅删除函数
+
+2. -v 仅删除变量
+
+
+<a name="C"></a>
+
+## 使用示例
+
+set 示例：
+
+```bash
+
+declare mylove='Visual C++' #定义新环境变量
+
+set -a mylove #设置为环境变量
+
+env | grep mylove #显示环境变量值
+
+```
+
+unset 示例：
+
+```bash
+
+unset -v mylove #删除指定的环境变量
+
+
+```
+
+## 参考文章
+
+[Linux unset](http://man.linuxde.net/unset)
+
+[linux set ](http://man.linuxde.net/set)
+
+
+***END***
