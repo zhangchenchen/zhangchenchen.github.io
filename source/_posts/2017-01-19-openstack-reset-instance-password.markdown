@@ -17,7 +17,7 @@ tags: openstack
 [采用 nova rebuild instance 的方式](#D)
 
 
-[]()
+[采用 cloud-init 的方式](#E)
 
 
 <a name="A"></a>
@@ -65,21 +65,13 @@ tags: openstack
 
 <a name="E"></a>
 
-## 采用 
+## 采用 cloud-init 的方式
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+- 这种方法算是所有方法里面最轻便的，但坏处是需要自己定制脚本。对于cloud-init，不熟悉的话可以先翻一下[官方手册](http://cloudinit.readthedocs.io/en/latest/topics/capabilities.html)
+- 原理很简单：借助cloud-init,在虚拟机启动的时候开启一个服务，用来监测metadata中设定的某个值，如果该值发生改变（或者满足其他条件）即做出密码更改的动作并reboot。
+- 可喜的是，我在github找到了类似的代码[openstack-password-reset](https://github.com/vvaldez/openstack-password-reset) ,不过这个代码只是考虑了RH7系列，而且密码是随机生成的，如果再推给openstack，可能更复杂了。我又更改一下脚本，支持更多Linux版本，且把重设后的密码定死了。年后会把改过的代码挂到github上。
+- 这里面的reset Python程序是通过外链获取的，于是干脆在nova里加了一个API，用来获取该程序。
+- 如果是传递多个文件给cloud-init的话，需要使用MIME的格式，tips:一般是把多个脚本/cloud-config文件 打包成MIME格式文件，然后压缩成gzip格式，传给cloud-init。
 
 
 
