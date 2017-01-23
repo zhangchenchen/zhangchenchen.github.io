@@ -28,7 +28,7 @@ tags: openstack
 
 ## nova 相关的快照/备份机制
 
-#### Nova 快照
+### Nova 快照
 - 命令为nova image-create
 - 严格来说，该快照并不是真正意义的快照，更像是创建一个镜像，所以命令为image-create.它并没有使用virt提供的virsh snapshot-create来创建snapshot，仅仅将虚拟机的系统磁盘文件完整的复制一份，然后把复制的文件上传至 glance 中作为镜像，之后二者毫无关联，类似于全量快照(没有考虑ceph作为统一存储)[check this](http://wsfdl.com/openstack/2014/08/12/Nova%E5%BF%AB%E7%85%A7%E5%88%86%E6%9E%90.html)。
 - nova 中的快照支持冷快照和live snapshot,两者的命令都是 nova image-create。当满足QEMU 1.3+ and libvirt 1.0+版本要求时会使用live snapshot,否则使用冷快照。关于两者区别以及流程，[check this](http://wsfdl.com/openstack/2014/08/12/Nova%E5%BF%AB%E7%85%A7%E5%88%86%E6%9E%90.html)
@@ -38,7 +38,7 @@ tags: openstack
 这样做的坏处是会产生新建镜像对原虚拟机的依赖性，需要定期flatten。还不知道L版是怎么处理的，挖个坑，回头看下具体实现。详细参考[基于rbd提升虚机快照创建速度](http://niusmallnan.com/_build/html/_templates/openstack/rbd_snap_insteadof_qemu_snap.html)
 
 
-#### Nova 备份
+### Nova 备份
 
 - 命令为 nova backup <server> <name> <backup-type> <rotation>
 - 其实该命令跟image-create的作用差不多，也是创建一个image,最大的区别就是它有一个rotation，会保证备份的个数为rotation个。详细的用法参考这个实例[Openstack - Nova Backup/Restore](http://qiita.com/idzzy/items/8b7833fc42b43a6db219)
@@ -50,7 +50,7 @@ tags: openstack
 
 ## cinder相关的快照/备份机制
 
-#### cinder 快照 
+### cinder 快照 
 
 - 命令为 cinder snapshot-create 同nova volume-snapshot-create一样效果。除了create,还有其他list,delete,metadata等命令。
 - 可以用snapshot 对volume进行恢复，见示例[Openstack - Cinder Snapshot/Restore](http://qiita.com/idzzy/items/cfb568e83e2645e3f32e)  
@@ -61,7 +61,7 @@ tags: openstack
 
 
 
-#### cinder 备份
+### cinder 备份
 
 - 命令 cinder backup-create 
 - cinder支持多种backend,对全量备份，增量备份的支持也不尽相同，这里只讨论以ceph rbd 作为backend的情况，其他的backend可以参考这里，[Openstack 中cinder backup三种backend的对比](http://blog.csdn.net/wytdahu/article/details/45246095)- 使用 rbd作为后端，支持全量备份和增量备份。backup-create时先尝试创建增量备份，如果不成功，会创建全量备份，不需要指明专门的参数。
