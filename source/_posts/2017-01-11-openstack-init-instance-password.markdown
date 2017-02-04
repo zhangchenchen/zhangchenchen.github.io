@@ -29,7 +29,7 @@ tags: openstack
 
 ## 关于cloud init
 
-- Cloud-Init 是一个用来自动配置虚拟机的初始设置（如主机名，网卡和密钥）的工具。它可以在使用模板部署虚拟机时使用，从而达到避免网络冲突的目的。在使用这个工具前，cloud-init 软件包必须在虚拟机上被安装。安装后，Cloud-Init 服务会在系统启动时搜索如何配置系统的信息。您可以使用只运行一次窗口来提供只需要配置一次的设置信息；或在新建虚拟机、编辑虚拟机和编辑模板窗口中输入虚拟机每次启动都需要的配置信息。（以上内容直接引用自red hat 官网）
+- Cloud-Init 是一个用来自动配置虚拟机的初始设置（如主机名，网卡和密钥）的工具（支持Linux,对于Windows系列有一个类似的工具，[cloudbase-init](https://github.com/cloudbase/cloudbase-init)）。它可以在使用模板部署虚拟机时使用，从而达到避免网络冲突的目的。在使用这个工具前，cloud-init 软件包必须在虚拟机上被安装。安装后，Cloud-Init 服务会在系统启动时搜索如何配置系统的信息。您可以使用只运行一次窗口来提供只需要配置一次的设置信息；或在新建虚拟机、编辑虚拟机和编辑模板窗口中输入虚拟机每次启动都需要的配置信息。（以上内容直接引用自red hat 官网）
 - cloud-init 的配置数据有两种：
     1. userdata:文件的形式，常见的如yaml文件，shell scripts，cloud config file。（cloud-init会自动识别以 "#!" 或 "#cloud-config" 开头的文件。）
     2. metedata:键值对的形式，常见的如：server name, instance id, display name and other cloud specific details.
