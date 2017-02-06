@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "openstack 系列--制作 openstack 镜像简记"
+title:  "openstack 系列--手动制作 openstack 镜像简记"
 date:   2017-01-17 15:17:25
 tags: openstack
 ---
@@ -17,7 +17,23 @@ tags: openstack
 
 [上传镜像](#E)
 
-[参考文章](#F)
+[自动创建镜像工具](#F)
+
+[参考文章](#G)
+
+
+tips:在制作镜像的时候最好先知晓镜像所要满足的要求，比如：是否支持磁盘分区，重设根分区大小，密码初始化等等。最常见的需求有如下几种：
+
+- Disk partitions and resize root partition on boot (cloud-init)
+- No hard-coded MAC address information
+- SSH server running
+- Disable firewall
+- Access instance using ssh public key (cloud-init)
+- Process user data and other metadata (cloud-init)
+- Paravirtualized Xen support in Linux kernel (Xen hypervisor only with Linux kernel version < 3.0)
+
+这部分内容可参考官方文档，[Image requirements](http://docs.openstack.org/image-guide/openstack-images.html) 。
+
 
 <a name="A"></a>
 
@@ -32,7 +48,7 @@ yum install libvirt
 yum install libguestfs-tools
 ```
 
-- 从[Centos镜像源](https://www.centos.org/download/mirrors/)下载一个最小的Centos7镜像。
+- 从[Centos镜像源](https://www.centos.org/download/mirrors/)下载一个最小的Centos7镜像。本文是以centos为例,其他操作系统类似，详见[Create images manually](http://docs.openstack.org/image-guide/create-images-manually.html#)
 
 ```bash
  wget - O http://mirrors.163.com/centos/7.2.1511/isos/x86_64/CentOS-7-x86_64-Minimal-1511.iso
@@ -96,7 +112,7 @@ systemctl enable acpid
 ```bash
 GRUB_CMDLINE_LINUX="crashkernel=auto console=tty0 console=ttyS0,115200n8"
 ```
-- 手动安装qemu-guest-agent：
+- 手动安装qemu-guest-agent(L 版的动态修改密码需要用到)：
 
 ```bash
 yum install -y qemu-guest-agent
@@ -133,18 +149,66 @@ yum install -y cloud-utils-growpart.x86_64
 rpm -qa kernel | sed 's/^kernel-//'  | xargs -I {} dracut -f /boot/initramfs-{}.img {}
 ```
 
-- 完成，虚拟机关机。
+- 基本完成，虚拟机关机。
+
+- 宿主机上进行清理工作：
+
+```bash
+virt-sysprep -d centos7 # 移除mac地址信息
+virsh undefine centos7 # 删除虚拟机
+```
 
 <a name="E"></a>
 
 ## 上传镜像
 
-上传镜像就不赘述了，有个窍门就是如果后端是ceph的话可以利用rbd import 的方式来加快速度。具体参考[手动制作Openstack镜像](http://int32bit.me/2016/05/28/%E6%89%8B%E5%8A%A8%E5%88%B6%E4%BD%9COpenstack%E9%95%9C%E5%83%8F/) 的上传镜像部分。
+- 镜像格式转换（ceph只支持raw格式）
+
+```bash
+qemu-img convert -f qcow2 -O raw centos.qcow2 centos.raw
+```
+
+- 直接用glance上传镜像就不赘述了，这里有个窍门就是如果后端是ceph的话可以利用rbd import 的方式来加快速度，如下。 
+- 首先glance create 一条记录，但没有执行镜像上传操作，只是新建一条数据库记录。并记录下image-id。
+
+```bash
+glance image-create
+```
+- 利用ceph import 镜像并执行快照
+
+```bash
+rbd --pool=volumes import  centos.raw  --image=$IMAGE_ID --new-format --order 24
+rbd --pool=volumes --image=$IMAGE_ID --snap=snap snap create
+rbd --pool=volumes --image=$IMAGE_ID --snap=snap snap protect
+```
+- 设置镜像的location url
+```bash
+glance location-add --url rbd://$FS_ROOT/glance_images/$IMAGE_ID/snap $IMAGE_ID#这里的$FS_ROOT 可以通过查看ceph -s 中的cluster.
+```
+
+- 完善镜像的其他属性
+
+```bash
+glance image-update --name="centos-7.2-64bit" --disk-format=raw --container-format=bare
+
+# 配置qemu-ga，该步骤是必须的，否则libvert启动虚拟机时不会生成qemu-ga配置项，导致虚拟机内部的qemu-ga由于找不到对应的虚拟串行字符设备而启动失败，提示找不到channel
+glance image-update --property hw_qemu_guest_agent=yes $IMAGE_ID
+```
+
+具体参考[手动制作Openstack镜像](http://int32bit.me/2016/05/28/%E6%89%8B%E5%8A%A8%E5%88%B6%E4%BD%9COpenstack%E9%95%9C%E5%83%8F/) 的上传镜像部分。
+
 
 <a name="F"></a>
+## 自动创建镜像工具
+
+openstack 文档提供了几个类似的工具，没有尝试，[Tool support for image creation](http://docs.openstack.org/image-guide/create-images-automatically.html).
+
+
+<a name="G"></a>
 
 ## 参考文章
 
+[openstack doc:Example: CentOS image](http://docs.openstack.org/image-guide/centos-image.html)
 
 [手动制作Openstack镜像](http://int32bit.me/2016/05/28/%E6%89%8B%E5%8A%A8%E5%88%B6%E4%BD%9COpenstack%E9%95%9C%E5%83%8F/)
 
@@ -156,6 +220,6 @@ rpm -qa kernel | sed 's/^kernel-//'  | xargs -I {} dracut -f /boot/initramfs-{}.
 
 [谈谈Openstack的CentOS镜像](http://www.chenshake.com/about-openstack-centos-mirror/)
 
-
+[Image requirements](http://docs.openstack.org/image-guide/openstack-images.html)
 
 ***END***
