@@ -42,21 +42,26 @@ openstack网络部分应该算是最为复杂的，这里简单罗列下常用�
 
 ## ovs/brctl 命令
 
-主要是查看 openvswitch 创造的网桥信息 和 linux bridge 创造的网桥信息
-- ovs-vsctl show
-- brctl show 
+主要是针对 openvswitch 创造的网桥信息 和 linux bridge 创造的网桥信息
+
+1. 显示ovs创建的网桥信息：ovs-vsctl show  
+2. ovs 创建网桥br-eth0：ovs-vsctl add-br br-eth0
+3. 将网卡eth0 桥接在br-eth0上：ovs-vsctl add-port br-eth0 eth0
+4. 显示linux bridge 创建的网桥信息：brctl show 
+5. linux bridge 创建网桥br-eth1: brctl addbr br-eth1
+6. 将网卡eth1 桥接在br-eth1上: brctl addif br-eth1 eth1
 
 
 ## iptables 命令
 
 neutron 中的L3-agent 默认是用iptables来实现3层网络的实现，而且，security-group, Firewall的实现也都与iptables息息相关。
 
-- 新增规则到某个规则链的最后一个：iptables -A INPUT ...  
-- 删除某个规则：iptables -D INPUT --dport 80 -j DROP 
-- 取代现行规则，顺序不变：iptables -R INPUT 1 -s 192.168.0.1 -j DROP  
-- 插入一条规则：iptables -I INPUT 1 --dport 80 -j ACCEPT  
-- 列出某规则链中的所有规则：iptables -L INPUT  
-- 列出nat表所有链中的所有规则：iptables -t nat -L  
+1. 新增规则到某个规则链的最后一个：iptables -A INPUT ...  
+2. 删除某个规则：iptables -D INPUT --dport 80 -j DROP 
+3. 取代现行规则，顺序不变：iptables -R INPUT 1 -s 192.168.0.1 -j DROP  
+4. 插入一条规则：iptables -I INPUT 1 --dport 80 -j ACCEPT  
+5. 列出某规则链中的所有规则：iptables -L INPUT  
+6. 列出nat表所有链中的所有规则：iptables -t nat -L  
 
 
 参考[Linux 防火墙和 iptables](http://liaoph.com/iptables/)
