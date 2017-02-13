@@ -114,25 +114,64 @@ dl_vlan是数据包原始的 VLAN ID，actions表示对数据包进行的操作�
 
 ## lay3 网络
 
+lay3 网络主要是一个路由的功能，即实现两个不同subnet之间instance的互联。除此之外，与外网的互联，firewall以及instance attach floating-ip 等功能也都是由L3 agent实现的虚拟路由器（net namespace + iptables）完成的。
 
 
+### linux bridge 实现lay3 网络
+
+首先需要修改配置文件，启用 l3 agent,配置文件位于控制节点/网络节点的/etc/neutron/l3_agent.ini，mechanism driver 是linux bridge(或openvswitch)。
+创建一个router后，如下示例：
+
+![router-ex](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20161018-1476795972212028903.jpg)
+
+看一下router是如何连接两个vlan 的subnet: l3 agent 会为每个 router 创建了一个 namespace，通过 veth pair 与 TAP 相连，然后将 Gateway IP 配置在位于 namespace 里面的 veth interface 上，这样就能提供路由了。
+![router-namespace](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20161018-1476795971897066009.jpg)
+这样便实现 vlan100 和 vlan 101 的连通了。
+
+再简单说下flaoting-ip attach的实现原理，floating-ip 的出现是为了让外网能够直接访问到被attached的instance。
+![floating-ip](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20161027-1477564018661061183.jpg)
+如图，是有两个内部vlan network和一个external network（网络类型可能是flat或vlan）,一个虚拟路由器将这三个网络连在一起，vm1通过虚拟路由器可以访问外网，但是外网没法直接主动连接vm1.我们将一个flaoting-ip 如10.10.10.3，attach到vm1之后，发现外网可以通过该floating-ip 直接连接vm1.进入vm1，看下它的网卡配置，发现并没有floating-ip对应的网卡存在。怎么回事呢，其实真正实现floating-ip attach操作的是发生在虚拟路由器上，查看下对应的虚拟路由器的网卡，
+![router-interface](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20161101-1478002791162005280.jpg?_=6020949)
+
+再看下虚拟路由器iptables的nat配置，
+![router-iptables](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20161101-1478002791526056451.jpg?_=6020949)
+
+这样，便明白了，floating IP 是配置在 router 的外网 interface 上的，而非 instance，floating IP 能够让外网直接访问租户网络中的 instance，这是通过在 router 上应用 iptalbes 的 NAT 规则实现的。 
 
 
+### openvswitch 实现lay3 网络
 
+与linux bridge 的实现类似，只不过这里不是挂载在不同bridge上，而是直接挂载在br-int上。
 
+![ovs-layer3-net](http://7xo6kd.com1.z0.glb.clouddn.com/upload-ueditor-image-20170124-1485241324112000116.jpg)
 
+两个 Gateway IP 分别配置在 qr-2ffdb861-73 和 qr-d295b258-45 上,从而实现两个subnet的连接。
+floating-ip attach 与Linux bridge类似实现。
 
 ## lay2 vxlan 型网络
 
+除了local, flat, vlan 这几类网络，OpenStack 还支持 vxlan 和 gre 这两种 overlay network。所谓overlay，是指指建立在其他网络上的网络，比如vxlan就是在udp的基础上实现。 vxlan 和 gre 都是基于隧道技术实现的。目前 linux bridge 只支持 vxlan，不支持 gre；open vswitch 两者都支持。因为vxlan与gre类似，这里只讨论vxlan。
+VXLAN 提供与 VLAN 相同的以太网二层服务，但是拥有更强的扩展性和灵活性。与 VLAN 相比，VXLAN 有下面几个优势：
+
+1. 支持更多的二层网段。 VLAN 使用 12-bit 标记 VLAN ID，最多支持 4094 个 VLAN，这对于大型云部署会成为瓶颈。VXLAN 的 ID （VNI 或者 VNID）则用 24-bit 标记，支持 16777216 个二层网段。
+2. 能更好地利用已有的网络路径。 VLAN 使用 Spanning Tree Protocol 避免环路，这会导致有一半的网络路径被 block 掉。VXLAN 的数据包是封装到 UDP 通过三层传输和转发的，可以使用所有的路径。
+3. 避免物理交换机 MAC 表耗尽。 由于采用隧道机制，TOR (Top on Rack) 交换机无需在 MAC 表中记录虚拟机的信息。
 
 
+VXLAN 是将二层建立在三层上的网络。 通过将二层数据封装到 UDP 的方式来扩展数据中心的二层网段数量。 VXLAN 是一种在现有物理网络设施中支持大规模多租户网络环境的解决方案。 VXLAN 的传输协议是 IP + UDP。
+
+VXLAN 定义了一个 MAC-in-UDP 的封装格式。 在原始的 Layer 2 网络包前加上 VXLAN header，然后放到 UDP 和 IP 包中。 通过 MAC-in-UDP 封装，VXLAN 能够在 Layer 3 网络上建立起了一条 Layer 2 的隧道。
+
+关于 vxlan 的包格式以及相关的设备的，参考[VXLAN 概念（Part I） - 每天5分钟玩转 OpenStack（108）](https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f/entry/VXLAN_%E6%A6%82%E5%BF%B5_Part_I_%E6%AF%8F%E5%A4%A95%E5%88%86%E9%92%9F%E7%8E%A9%E8%BD%AC_OpenStack_108?lang=en)
 
 
+### linux bridge 实现vxlan 网络
 
+[VXLAN 概念（Part II）- 每天5分钟玩转 OpenStack（109）](https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f/entry/VXLAN_%E6%A6%82%E5%BF%B5_Part_II_%E6%AF%8F%E5%A4%A95%E5%88%86%E9%92%9F%E7%8E%A9%E8%BD%AC_OpenStack_109?lang=en)
 
+### ovs 实现vxlan 网络
 
-
-
+[OVS vxlan 底层结构分析 - 每天5分钟玩转 OpenStack（148）](http://www.cnblogs.com/CloudMan6/p/6376523.html)
 
 
 ***END***
