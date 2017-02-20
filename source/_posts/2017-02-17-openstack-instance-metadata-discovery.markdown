@@ -22,7 +22,7 @@ tags: openstack
 openstack 中，虚拟机获取metadata 的信息有两种，即config drive 和 metadata restful 服务（即EC2方式）。下面分别记录下两种方式的原理：
 
 
-#### config drive 的方式
+### config drive 的方式
 
 所谓 config drive的方式就是将metadata信息写入虚拟机的一个特殊配置设备中，虚拟机启动的时候会挂载并读取metadata信息。要想实现这个功能，还需要宿主机和镜像满足一些条件：
  
@@ -69,7 +69,7 @@ openstack/latest/user_data
 可以看出，config drive支持 openstack以及EC2的方式获取数据，官方手册建议使用opensatck的方式（即读取opensatck目录里的内容），因为EC2的目录以后可能会弃用。而且最好使用最近的版本目录读取。
 
 
-####  metadata restful 服务的方式
+###  metadata restful 服务的方式
 
 就是我们在虚拟机通过169.254.169.254的方式来获取metadata的方式。由以下三个组件来完成这项工作：
 
