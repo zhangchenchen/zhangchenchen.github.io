@@ -73,3 +73,5 @@ deploy:
   branch: master
 
 duoshuo_shortname: zhangchenchen
+
+google_analytics: UA-92407570-1
