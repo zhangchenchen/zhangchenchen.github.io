@@ -113,10 +113,10 @@ v2版本对用户的权限管理以每一个用户为单位，需要对每一个
 
 - 向 keystone 发送post请求获取 token 以及 service endpoint:
 
-    resuest headers 内容如下：
+    request headers 内容如下：
 ![headers](http://oeptotikb.bkt.clouddn.com/2.png)
 
-    resuest body 内容如下：
+    request body 内容如下：
 
 ![body](http://oeptotikb.bkt.clouddn.com/2017-02-22-header-body.png) 
     返回结果如下：
