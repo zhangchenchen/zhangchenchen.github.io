@@ -73,3 +73,11 @@ deploy:
   branch: master
 
 duoshuo_shortname: zhangchenchen
+
+google_analytics: UA-92407570-1
+
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
