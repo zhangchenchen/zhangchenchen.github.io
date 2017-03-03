@@ -45,11 +45,13 @@ openstack网络部分应该算是最为复杂的，这里简单罗列下常用�
 主要是针对 openvswitch 创造的网桥信息 和 linux bridge 创造的网桥信息
 
 1. 显示ovs创建的网桥信息：ovs-vsctl show  
-2. ovs 创建网桥br-eth0：ovs-vsctl add-br br-eth0
-3. 将网卡eth0 桥接在br-eth0上：ovs-vsctl add-port br-eth0 eth0
-4. 显示linux bridge 创建的网桥信息：brctl show 
-5. linux bridge 创建网桥br-eth1: brctl addbr br-eth1
-6. 将网卡eth1 桥接在br-eth1上: brctl addif br-eth1 eth1
+2. 查看网桥br-tun上的流表信息：ovs-ofctl dump-flows br-tun
+3. ovs 创建网桥br-eth0：ovs-vsctl add-br br-eth0
+4. 将网卡eth0 桥接在br-eth0上：ovs-vsctl add-port br-eth0 eth0
+5. 查看datapath统计信息：ovs-dpctl show -s
+6. 显示linux bridge 创建的网桥信息：brctl show 
+7. linux bridge 创建网桥br-eth1: brctl addbr br-eth1
+8. 将网卡eth1 桥接在br-eth1上: brctl addif br-eth1 eth1
 
 
 ## iptables 命令
