@@ -83,6 +83,7 @@ Ceph 支持为某一rbd snapshot创建很多个写时复制（ COW ）克隆。�
 
 分层快照使得 Ceph 块设备客户端可以很快地创建映像，这样便能实现openstack 中非常快的创建VM,而且，随着 openstack 的Nova image-create与ceph的snapshot的无缝连接，镜像的制作更快捷方便了，关于这部分，可以参考[基于Ceph RBD的OpenStack Nova快照](http://ceph.org.cn/2016/05/02/%E5%9F%BA%E4%BA%8Eceph-rbd%E7%9A%84openstack-nova%E5%BF%AB%E7%85%A7/)
 
+关于 rbd snapshot 的内在原理 ，参考[ceph rbd快照原理解析](http://www.sysnote.org/2016/02/28/ceph-rbd-snap/)
 
 clone 的 步骤如下：
 
@@ -124,5 +125,8 @@ $ rbd unmap /dev/rbd/{poolname}/{imagename} # 取消块设备映射
 
 [CEPH 块设备](http://docs.ceph.org.cn/rbd/rbd/)
 
+[基于Ceph RBD的OpenStack Nova快照](http://ceph.org.cn/2016/05/02/%E5%9F%BA%E4%BA%8Eceph-rbd%E7%9A%84openstack-nova%E5%BF%AB%E7%85%A7/)
+
+[ceph rbd快照原理解析](http://www.sysnote.org/2016/02/28/ceph-rbd-snap/)
 
 ***END***
