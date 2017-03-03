@@ -105,7 +105,7 @@ $ rbd flatten {pool-name}/{image-name} # 拍平克隆映像
 
 
 
-### rbd map/unmap
+### rbd 与内核相关的map/unmap
 
 ```bash
 $ rbd map {pool-name}/{image-name} --id {user-name} # 映射块设备
