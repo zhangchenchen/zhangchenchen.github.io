@@ -66,7 +66,10 @@ neutron 中的L3-agent 默认是用iptables来实现3层网络的实现，而且
 6. 列出nat表所有链中的所有规则：iptables -t nat -L  
 
 
-参考[Linux 防火墙和 iptables](http://liaoph.com/iptables/)
+## 参考文章
+
+[Linux 防火墙和 iptables](http://liaoph.com/iptables/)
+
 [Linux iptables 命令行操作常用指令](https://cnzhx.net/blog/common-iptables-cli/)
 
 

@@ -108,6 +108,10 @@ $ rbd flatten {pool-name}/{image-name} # 拍平克隆映像
 
 ### rbd 与内核相关的map/unmap
 
+注意：由于Linux kernel支持rbd的版本较高，一般需要升级到较高版本（建议升级到3.11+）
+
+升级内核参考[使用Yum快速更新升级CentOS内核](https://www.sjy.im/toss/use-yum-update-centos-kernel-quickly.html)
+
 ```bash
 $ rbd map {pool-name}/{image-name} --id {user-name} # 映射块设备
 

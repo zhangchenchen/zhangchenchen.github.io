@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "openstack 系列--手动制作 openstack 镜像简记"
+title:  "openstack 系列--利用Vmware workstation手动制作 openstack centos镜像简记"
 date:   2017-01-17 15:17:25
 tags: openstack
 ---
@@ -39,13 +39,14 @@ tips:在制作镜像的时候最好先知晓镜像所要满足的要求，比如
 
 ## 准备工作
 
-- 下载Vmware workstation,并安装Centos7,配置好网络。注：刚开始是用的virtualbox,发现不支持nested KVM,Vmware workstation 10+版本以上应该都可以。
+- 下载Vmware workstation,并安装Centos7,配置好网络。注：刚开始是用的virtualbox,发现不支持nested KVM,Vmware workstation 10+版本以上应该都可以,注意开启workstation的虚拟化设置。
 - 宿主机（刚装好的Centos）安装libvirt系列工具:
 
 ```bash
 yum groupinstall Virtualization "Virtualization Client" 
 yum install libvirt
 yum install libguestfs-tools
+service libvirtd restart 
 ```
 
 - 从[Centos镜像源](https://www.centos.org/download/mirrors/)下载一个最小的Centos7镜像。本文是以centos为例,其他操作系统类似，详见[Create images manually](http://docs.openstack.org/image-guide/create-images-manually.html#)
