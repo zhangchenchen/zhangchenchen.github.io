@@ -2,7 +2,9 @@
 layout: post
 title:  "openstack-- 如何升级现有镜像"
 date:   2017-03-07 13:13:46
-tags: openstack
+tags: 
+  - openstack
+  - ceph
 ---
 
 
