@@ -103,7 +103,7 @@ iptables -t nat -A POSTROUTING -s 192.168.122.0/255.255.255.0 -d 192.168.122.173
 ## 配置系统
 
 - SSH到虚拟机后就可以开始一系列的配置工作，首先修改yum源为国内源。
-- 安装acpid服务，并设置开机自启动。
+- 安装acpid服务，并设置开机自启动（acpid服务是用于hypervisor与虚拟机的交互）。
 ```bash
 yum install -y acpid
 systemctl enable acpid
@@ -182,12 +182,8 @@ rbd --pool=volumes import  centos.raw  --image=$IMAGE_ID --new-format --order 24
 rbd --pool=volumes --image=$IMAGE_ID --snap=snap snap create
 rbd --pool=volumes --image=$IMAGE_ID --snap=snap snap protect
 ```
-- 设置镜像的location url
-```bash
-glance location-add --url rbd://$FS_ROOT/glance_images/$IMAGE_ID/snap $IMAGE_ID#这里的$FS_ROOT 可以通过查看ceph -s 中的cluster.
-```
 
-- 完善镜像的其他属性
+- 完善镜像的必要属性
 
 ```bash
 glance image-update --name="centos-7.2-64bit" --disk-format=raw --container-format=bare
@@ -195,6 +191,12 @@ glance image-update --name="centos-7.2-64bit" --disk-format=raw --container-form
 # 配置qemu-ga，该步骤是必须的，否则libvert启动虚拟机时不会生成qemu-ga配置项，导致虚拟机内部的qemu-ga由于找不到对应的虚拟串行字符设备而启动失败，提示找不到channel
 glance image-update --property hw_qemu_guest_agent=yes $IMAGE_ID
 ```
+
+- 设置镜像的location url
+```bash
+glance location-add --url rbd://$FS_ROOT/glance_images/$IMAGE_ID/snap $IMAGE_ID#这里的$FS_ROOT 可以通过查看ceph -s 中的cluster.
+```
+
 
 具体参考[手动制作Openstack镜像](http://int32bit.me/2016/05/28/%E6%89%8B%E5%8A%A8%E5%88%B6%E4%BD%9COpenstack%E9%95%9C%E5%83%8F/) 的上传镜像部分。
 
