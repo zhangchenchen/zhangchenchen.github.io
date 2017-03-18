@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "openstack-- ovs 安装以及常用操作"
+title:  "openstack-- Open vSwitch 安装以及常用操作"
 date:   2017-03-16 14:10:32
 tags: 
   - openstack
@@ -134,6 +134,6 @@ ovs的常用子命令如下,直接引用自[OVS常用操作总结](http://fishcr
 
 [Open vSwitch的ovs-vsctl命令详解](http://www.rendoumi.com/open-vswitchde-ovs-vsctlming-ling-xiang-jie/)
 
-
+[OVS常用操作总结](http://fishcried.com/2016-02-09/openvswitch-ops-guide/)
 
 ***END***

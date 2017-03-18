@@ -101,6 +101,16 @@ ceph-deploy --overwrite-conf admin deploy node1 node2 node3
 
 Package does not match intended 这个错误在我安装其他软件的时候也出现过，用尽了各种办法也没有解决该问题，但我在家里的时候却没有出现过该问题。所以推测是公司网络用了类似缓存的机制。
 
+## 更新-2017-3-18
+
+找到了解决上述问题的方法，就是先直接wget下来rpm包，然后用yum localinstall 或者rpm -ivh 安装,如果出现两个包互相依赖的情况，就两个包同时安装。
+
+```bash
+wget http://mirrors.163.com/ceph/rpm-jewel/el7/x86_64/ceph-mds-10.2.5-0.el7.x86_64.rpm
+
+yum localinstall ceph-mds-10.2.5-0.el7.x86_64.rpm
+```
+
 
 ## 参考文章
 
