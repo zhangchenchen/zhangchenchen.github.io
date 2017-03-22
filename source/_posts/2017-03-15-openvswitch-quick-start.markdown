@@ -70,7 +70,7 @@ $ chkconfig openvswitch on #设置开机自启动
 
 ### ovs架构
 
-![ovs-arc](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-16-openvswitch-arch.png)
+![ovs-arc](http://oeptotikb.bkt.clouddn.com/2017-03-11-openvswitch-arch.png)
 
 主要由三个组件组成：
 
