@@ -11,7 +11,7 @@ tags:
 
 ## 引出
 
-公司云平台有些镜像的密码注入出了点问题，问题的原因初步诊断为镜像问题，需要对这些镜像进行cloudinit/cloudbase的升级操作。对于已知密码的镜像，可以直接开启一个虚拟机，完成升级后，对该虚拟机做snapshot 操作（nova image-create）即可。对于不知道密码的镜像，经过一番搜索后，可以通过将镜像挂载到本地宿主机，然后chroot的方法进行升级。以下为一些简单记录。
+公司云平台有些镜像的密码注入出了点问题，问题的原因初步诊断为镜像问题，需要对这些镜像进行cloudinit/cloudbase的升级操作。对于已知密码的镜像，可以直接开启一个虚拟机，完成升级后，对该虚拟机做snapshot 操作（nova image-create）即可。对于不知道密码的镜像，经过一番搜索后，可以通过将镜像挂载到本地宿主机，然后chroot的方法进行升级,后来又从官网了解到利用libguestfish 的方法。以下为一些简单记录。
 
 
 ## 利用 nova image-create 升级镜像 
@@ -22,7 +22,7 @@ tags:
 - 镜像完成。
 
 
-## 利用 chroot的方法升级忘记密码的镜像
+## 利用 本地挂载的方法升级镜像
 
 如果忘记密码的话我们可以使用该方法进行镜像的升级，不过因为glance后端存储方式的不同，挂载到本地HOST的方法也不同，下文分别以本地存储，ceph存储讲解。
 
@@ -179,10 +179,30 @@ $ glance image-update --location rbd://$FSID/$POOL/$NEW_IMAGE_ID/snap ${NEW_IMAG
 ```
 
 
+## 使用 libguestfs 修改虚拟机镜像
+
+
+### libguestfs项目介绍
+
+to be continued
+
+### 部分示例
+
+to be continued
+
+
+
+## 更新-2017-03-23
+
+增加 libguestfs 修改虚拟机镜像的方法。
+
+
 
 
 ## 参考文章
 
+
+[Modify images](https://docs.openstack.org/image-guide/modify-images.html)
 
 [在线升级glance镜像技巧](http://int32bit.me/2016/06/04/%E5%9C%A8%E7%BA%BF%E6%9B%B4%E6%96%B0Glance%E9%95%9C%E5%83%8F/)
 
