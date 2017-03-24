@@ -184,17 +184,112 @@ $ glance image-update --location rbd://$FSID/$POOL/$NEW_IMAGE_ID/snap ${NEW_IMAG
 
 ### libguestfs项目介绍
 
-to be continued
+libguestfs 其实是一系列工具组成的，目的就是为了连接并修改本地虚拟机镜像。可以实现的功能有很多，包括：修改镜像内文件，脚本，查看镜像文件系统容量使用情况，物理机与虚拟镜像之间的文件传递，备份，克隆，甚至新建虚拟机实例，格式化磁盘,修改磁盘大小等等。参考[libguestfs ](http://libguestfs.org/)
 
 ### 部分示例
 
-to be continued
+安装比较简单，如果是rh/centos系列，直接yum安装：
+
+```bash
+$ yum install -y libguestfs-tools
+```
+
+下面主要分三部分guestfish，guestmount 以及virt-* tools 讲解
+
+#### guestfish 讲解与示例
+
+通俗讲，guestfish 的作用就是修改镜像内的文件。它并不会将镜像文件系统直接挂载到本地，而是提供了一个类似shell的交互接口允许你查看，编辑，删除文件。
+
+示例：
+
+```bash
+$ guestfish --rw -a centos63.raw  # 进入guestfish shell ,Mount the image in read-write mode as root
+
+```
+进入之后 ，先执行run ，会创建一个虚拟机实例。
+
+![libguestfs](http://oeptotikb.bkt.clouddn.com/2017-03-24-libguestfs.png)
+
+如果出现错误的话，可以 export LIBGUESTFS_DEBUG=1 打开debug模式查找错误。或者利用 libguestfs-test-tool 命令测试一下。
+接下来示例编辑网卡配置：
+
+```bash
+><fs> list-filesystems  #列出可挂载的文件系统
+
+><fs> mount /dev/vg_centosbase/lv_root /  #挂载
+
+><fs> edit /etc/sysconfig/network-scripts/ifcfg-eth0 #编辑文件
+
+><fs> exit #退出
+```
+
+
+#### guestmount 讲解与示例
+
+guestmount 可以实现直接将镜像的文件系统挂载到本地。示例如下：
+
+```bash
+$ guestmount -a centos63_desktop.qcow2 -i --rw /mnt # i 参数表示自动查找root分区并挂载
+
+$ rpm -qa --dbpath /mnt/var/lib/rpm  #示例查看rpm包
+
+$ umount /mnt 
+```
+
+若umount失败（通常报错 device is busy），可以使用lazy umount，加 l 参数，即：
+
+```bash
+$ umount /mnt -l
+```
 
 
 
-## 更新-2017-03-23
+#### virt-* tools 讲解与示例
 
-增加 libguestfs 修改虚拟机镜像的方法。
+大概以下几种工具：
+
+- virt-edit : 修改镜像内的文件。
+- virt-df : 查看镜像磁盘占用情况。
+- virt-resize : resize 镜像。
+- virt-sysprep : 准备发布镜像前的一系列操作（比如删除SSH HOST，删除mac地址，删除user 信息）
+- virt-sparsify : 镜像稀疏（消除镜像空洞）
+- virt-p2v : 物理机转换为虚拟机（kvm）.
+- virt-v2v : xen或vmware镜像转换为kvm镜像。
+
+几个示例（来自[openstack doc](https://docs.openstack.org/image-guide/modify-images.html)）:
+
+第一个示例是修改镜像文件：
+
+```bash
+$ virsh shutdown instance-000000e1
+
+$ virt-edit -d instance-000000e1 /etc/shadow  # d means domain
+
+$ virsh start instance-000000e1
+
+```
+
+第二个示例是 resize image：
+
+```bash
+$ virt-filesystems --long --parts --blkdevs -h -a /data/images/win2012.qcow2 #查看分区
+
+$ qemu-img create -f qcow2 /data/images/win2012-50gb.qcow2 50G #新建一块qcow2 image 空间
+
+$ virt-resize --expand /dev/sda2 /data/images/win2012.qcow2 /data/images/win2012-50gb.qcow2 # 扩展空间
+
+```
+
+
+
+
+
+## 更新
+
+ - 2017-03-23 增加 libguestfs 修改虚拟机镜像的方法。
+
+
+ - 2017-03-34 增加 libguestfs 部分示例
 
 
 
@@ -213,5 +308,11 @@ to be continued
 [如何挂载一个镜像文件(HOW TO MOUNT AN IMAGE FILE)](http://smilejay.com/2012/08/mount-an-image-file/)
 
 [挂载虚拟机镜像文件里的 LVM 逻辑分区](http://www.vpsee.com/2010/10/mount-lvm-volumes-from-loopback-disk-images/)
+
+[libguestfs ](http://libguestfs.org/)
+
+[kvm虚拟化小结（六）libguestfs-tools](http://www.361way.com/kvm-libguestfs-tools/3175.html)
+
+[libguestfs详解](http://www.hanbaoying.com/2017/02/26/libguestfs.html)
 
 ***END***
