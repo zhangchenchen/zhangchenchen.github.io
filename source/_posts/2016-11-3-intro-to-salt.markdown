@@ -309,6 +309,8 @@ reactor 系统会结合sls文件在master端去匹配event tags，匹配成功�
 
 关于架构部分，内容比较繁杂，通常会涉及到multimaster,multimaster with failover,salt-syndic等，后续有需求了再研究吧。
 
+参考[SALTSTACK ARCHITECTURE](http://docs.saltstack.cn/topics/topology/index.html)
+
 
 
 
