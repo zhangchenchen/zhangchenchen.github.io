@@ -60,7 +60,7 @@ LVM的基本组成块如下：
 
 ![lvm-6](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-6.png)
 
-重启机器，将/dev/sda3创建物理卷，并将该物理卷加入卷组。
+重启机器（或者不重启，执行 partprobe 命令让内核更新分区表），将/dev/sda3创建物理卷，并将该物理卷加入卷组。
 
 ![lvm-7](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-7.png)
 
