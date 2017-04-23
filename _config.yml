@@ -72,7 +72,7 @@ deploy:
   repository: git@github.com:zhangchenchen/zhangchenchen.github.io.git
   branch: master
 
-duoshuo_shortname: zhangchenchen
+disqus_shortname: pekingzcc
 
 google_analytics: UA-92407570-1
 
