@@ -105,25 +105,33 @@ openstack doc 中提到在用HAproxy做galara cluster 的负载均衡时，因�
 
 ### L3 agent HA
 
+L3 agent 的HA ,官方给出的方案有两种，一种是利用VRRP协议（虚拟路由冗余协议）实现，另一种是DVR(分布式虚拟路由)实现。
+关于VRRP协议，可以参考[Neutron L3 Agent HA 之 虚拟路由冗余协议（VRRP）](http://www.cnblogs.com/sammyliu/p/4692081.html), 具体配置以及网络的连接情况直接参考官方给的[guide](https://docs.openstack.org/newton/networking-guide/deploy-ovs-ha-vrrp.html)
 
-
+同样，关于DVR的资料参考[Neutron 分布式虚拟路由（Neutron Distributed Virtual Routing）](http://www.cnblogs.com/sammyliu/p/4713562.html),以及官方[guide](https://docs.openstack.org/newton/networking-guide/config-dvr-ha-snat.html)
 
 ### DHCP agent HA
 
-
+DHCP协议本身支持多个DHCP服务器，只需修改配置，为每个租户网络创建多个DHCP agent,即可实现HA。
 
 
 
 ## 存储控制节点 HA
 
-
-
+cinder-volume的HA A/A方案目前还未实现，只能采取pacemaker 实现H/A，不过，随着openstack  Tooz 项目的开发完善，cinder-volume的A/A方案也渐渐明朗，就是采用openstack  Tooz  项目实现的分布式锁来实现。详细信息参考[cinder-volume如何实现AA高可用](http://int32bit.me/2017/03/16/cinder-volume%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0AA%E9%AB%98%E5%8F%AF%E7%94%A8/)
 
 
 ## 计算节点 HA
 
+包括计算节点和虚拟机的HA,社区从2016年9月开始一直致力于一个虚拟机HA的统一方案，
+详细参考[igh Availability for Virtual Machines](http://specs.openstack.org/openstack/openstack-user-stories/user-stories/proposed/ha_vm.html).目前还是处于开发阶段。
 
+业界目前使用的方案大致有以下几种：
 
+- controller节点与compute节点通信（ping等），检查nova 服务运行状态，对于有问题的节点进行简单粗暴的evacuate.
+- Pacemaker-remote： 突破Corosync的集群规模限制，参考[RDO的方案](https://github.com/beekhof/osp-ha-deploy/blob/master/ha-openstack.md)
+- 集中式检查
+- 分布式健康检查，参考[分布式健康检查：实现OpenStack计算节点高可用](http://www.infoq.com/cn/articles/OpenStack-awcloud-HA)
 
 
 
