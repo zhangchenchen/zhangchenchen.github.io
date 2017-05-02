@@ -186,7 +186,7 @@ rbd --pool=volumes --image=$IMAGE_ID --snap=snap snap protect
 - 完善镜像的必要属性
 
 ```bash
-glance image-update --name="centos-7.2-64bit" --disk-format=raw --container-format=bare
+glance image-update --name="centos-7.2-64bit" --disk-format=raw --container-format=bare $IMAGE_ID
 
 # 配置qemu-ga，该步骤是必须的，否则libvert启动虚拟机时不会生成qemu-ga配置项，导致虚拟机内部的qemu-ga由于找不到对应的虚拟串行字符设备而启动失败，提示找不到channel
 glance image-update --property hw_qemu_guest_agent=yes $IMAGE_ID
