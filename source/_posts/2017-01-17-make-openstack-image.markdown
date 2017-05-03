@@ -83,7 +83,7 @@ service libvirtd restart
 
 ## 安装Centos系统
 
-- 利用vnc-viewer 连接 虚拟机，默认是宿主机IP+5900端口。并进行虚拟机的安装。
+- 利用vnc-viewer 连接 虚拟机，默认是宿主机IP+5900端口。并进行虚拟机的安装。安装时注意大多数配置默认即可，SOFTWARE SELECTION选择Minimal Install，INSTALLATION DESTINATION需要选择手动配置分区，我们只需要一个根分区即可，不需要swap分区，文件系统选择ext4，存储驱动选择Virtio Block Device。
 - 安装完成后，为了能够联外网，以及用宿主机直接SSH 虚拟机，还要进行网络的配置。KVM虚拟机的网络配置方式主要有两种，Bridge模式和NAT 模式，关于两种模式的介绍可以参考这篇文章，[KVM虚拟机网络配置 Bridge方式，NAT方式](http://blog.csdn.net/hzhsan/article/details/44098537/)。我们这里使用默认的NAT模式，但是NAT模式有个弊端就是无法从宿主机SSH虚拟机，这样我们还要做些额外的工作实现该功能。
 - 通过端口转发来实现宿主机直连虚拟机，具体参考[这里](http://www.bkjia.com/Linuxjc/877147.html#top)。
 
@@ -111,8 +111,16 @@ systemctl enable acpid
 
 - 虚拟机需要打开boot日志功能，并指定console，这样nova console-log才能获取虚拟机启动时的日志。修改配置文件/etc/default/grub，设置GRUB_CMDLINE_LINUX为：
 ```bash
-GRUB_CMDLINE_LINUX="crashkernel=auto console=tty0 console=ttyS0,115200n8"
+GRUB_CMDLINE_LINUX=" vconsole.keymap=us console=tty0 vconsole.font=latarcyrheb-sun16 console=ttyS0,115200"
 ```
+
+执行以下语句：
+
+```bash
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+ubuntu 的话执行 update-grub。
+
 - 手动安装qemu-guest-agent(L 版的动态修改密码需要用到)：
 
 ```bash
@@ -146,7 +154,7 @@ yum install -y cloud-init
 ```bash
 yum update -y
 yum install -y epel-release
-yum install -y cloud-utils-growpart.x86_64
+yum install -y cloud-utils-growpart
 rpm -qa kernel | sed 's/^kernel-//'  | xargs -I {} dracut -f /boot/initramfs-{}.img {}
 ```
 
