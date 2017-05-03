@@ -70,7 +70,7 @@ service libvirtd restart
 ```bash
  sudo virt-install --virt-type kvm --name centos7 --ram 1024 \  # name 是自己取得
   --disk centos.qcow2,format=qcow2 \      #disk参数为上面创建的磁盘
-  --network network=default \             # 默认KVM虚拟机网络为nat
+  --network network=default \             # 采用KVM虚拟机网络为nat，其实更建议用bridge模式，删除本行，默认即为bridge模式，不过bridge模式需要自己手动配置宿主机网桥
   --graphics vnc,listen=0.0.0.0 --noautoconsole \
   --os-type=linux --os-variant=rhel7 \
   --cdrom=/image/CentOS-7-x86_64-Minimal-1511.iso  #下载的镜像
