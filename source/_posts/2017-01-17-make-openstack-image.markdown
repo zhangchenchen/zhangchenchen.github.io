@@ -121,7 +121,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 ```
 ubuntu 的话执行 update-grub。
 
-- 手动安装qemu-guest-agent(L 版的动态修改密码需要用到)：
+- 手动安装qemu-guest-agent(版本必须是2.3+，L 版的动态修改密码需要用到)：
 
 ```bash
 yum install -y qemu-guest-agent

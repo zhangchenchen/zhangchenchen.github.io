@@ -41,7 +41,11 @@ tags: openstack
 ## 采用 libvirt-set-admin-password 
 
 - Openstack L 版本新加入的功能，直接使用 "nova set-password "(或早期版本client的"nova root-password") 就可以，之前的版本该命令不支持Libvirt,仅支持XEN。
-- 适用条件：Openstack Libvirt+ 版本，宿主机libvirt版本1.2.16+，虚拟机镜像安装2.3+ 版本的qemu-guest-agent，等等，限制条件比较多，详见[虚拟机系统密码的修改方案¶](http://niusmallnan.com/_build/html/_templates/openstack/inject_passwd.html#id2)               
+- 适用条件：Openstack Libvirt+ 版本，宿主机libvirt版本1.2.16+，虚拟机镜像安装2.3+ 版本的qemu-guest-agent，详见[虚拟机系统密码的修改方案¶](http://niusmallnan.com/_build/html/_templates/openstack/inject_passwd.html#id2) 
+- 博主试验了linux 几个主要版本（debian,ubuntu，centos）,只要满足以上的限制条件，都能修改成功，不过官网提供的cloud 版本镜像大都没有安装 qemu-guest-agent，或者版本太低，需要自己安装并制作成镜像。
+
+
+
 <a name="D"></a>
 
 ## 采用 nova image-create / nova rebuild的方式
