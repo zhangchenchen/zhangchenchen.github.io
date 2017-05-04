@@ -44,7 +44,7 @@ tags: openstack
 - 适用条件：Openstack Libvirt+ 版本，宿主机libvirt版本1.2.16+，虚拟机镜像安装2.3+ 版本的qemu-guest-agent，详见[虚拟机系统密码的修改方案¶](http://niusmallnan.com/_build/html/_templates/openstack/inject_passwd.html#id2) 
 - 博主试验了linux 几个主要版本（debian,ubuntu，centos）,只要满足以上的限制条件，都能修改成功，不过官网提供的cloud 版本镜像大都没有安装 qemu-guest-agent，或者版本太低，需要自己安装并制作成镜像。
 
-
+- 关于qemu-guest-agent ，可以参考[nova 通过 qemu-guest-agent 修改用户密码](http://blog.csdn.net/zzh_gaoxingjiuhao/article/details/52638863)
 
 <a name="D"></a>
 
