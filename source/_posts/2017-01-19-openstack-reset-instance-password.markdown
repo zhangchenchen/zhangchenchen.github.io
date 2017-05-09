@@ -42,7 +42,10 @@ tags: openstack
 
 - Openstack L 版本新加入的功能，直接使用 "nova set-password "(或早期版本client的"nova root-password") 就可以，之前的版本该命令不支持Libvirt,仅支持XEN。
 - 适用条件：Openstack Libvirt+ 版本，宿主机libvirt版本1.2.16+，虚拟机镜像安装2.3+ 版本的qemu-guest-agent，详见[虚拟机系统密码的修改方案¶](http://niusmallnan.com/_build/html/_templates/openstack/inject_passwd.html#id2) 
-- 博主试验了linux 几个主要版本（debian,ubuntu，centos）,只要满足以上的限制条件，都能修改成功，不过官网提供的cloud 版本镜像大都没有安装 qemu-guest-agent，或者版本太低，需要自己安装并制作成镜像。windows 的镜像相对比较麻烦点，而且宿主机要求安装virtio-win，参考[Running the QEMU Guest Agent on a Windows Guest](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/sect-QEMU_Guest_Agent-Running_the_QEMU_guest_agent_on_a_Windows_guest.html)
+- 博主试验了linux 几个主要版本（debian,ubuntu，centos）,只要满足以上的限制条件，都能修改成功，不过官网提供的cloud 版本镜像大都没有安装 qemu-guest-agent，或者版本太低，需要自己安装并制作成镜像。windows 的镜像相对比较麻烦点，宿主机装的virtio-win，通过文件挂载的方式给guest安装对应驱动和QGA,其实不用安装也可以，实现最终都是guest 安装virtio-serial驱动,然后安装quemu-guest-agent就可以了，还有一点就是要设置镜像的property ,例如：hw_qemu_guest_agent=yes，os_type=windows。 
+参考[Running the QEMU Guest Agent on a Windows Guest](https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Virtualization_Administration_Guide/sect-QEMU_Guest_Agent-Running_the_QEMU_guest_agent_on_a_Windows_guest.html)，[Can I have virtio-win package on CentOS](https://serverfault.com/questions/587238/can-i-have-virtio-win-package-on-centos)
+
+[CentOS 7.1 QEMU guest agent 安装 与 使用](http://bbs.qy.com.cn/forum.php?mod=viewthread&tid=1152) (注：这篇文章有点过时了，因为QGA以及驱动的版本已经升级了好几版，大部分功能都已经实现，比如密码修改等，但是整个流程是一致的)
 
 - 关于qemu-guest-agent ，可以参考[nova 通过 qemu-guest-agent 修改用户密码](http://blog.csdn.net/zzh_gaoxingjiuhao/article/details/52638863)
 
