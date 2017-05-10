@@ -54,6 +54,34 @@ $ cinder backup-create  --name incrementalbackup --incremental <volume-ID>
 
 ## 实现原理 
 
+关于备份的具体流程可以参考这张图：
+
+![backup-workflow](http://oeptotikb.bkt.clouddn.com/backup_workflow.png)
+
+![detail-backup](http://oeptotikb.bkt.clouddn.com/2017-05-10-backup-detail.jpg)
+
+熟悉ceph的话，应该知道ceph rbd的export-diff，import-diff 功能：
+
+- export-diff ：将某个 rbd image 在两个不同时刻的数据状态比较不同后导出补丁文件。
+- import-diff :将某个补丁文件合并到某个 rbd image 中。
+
+ceph 增量备份就是基于这两个基本功能，详细命令示例可以参考[rbd的增量备份和恢复](http://www.zphj1987.com/2016/06/22/rbd%E7%9A%84%E5%A2%9E%E9%87%8F%E5%A4%87%E4%BB%BD%E5%92%8C%E6%81%A2%E5%A4%8D/)
+
+
+### 首次备份
+
+- 在用作备份的ceph集群中新建一个base image，与源 volume 大小一致，name 的形式为 "volume-VOLUMD_UUID.backup.base"
+- 源 rbd image 新建一个快照，name形式为 backup.BACKUP_ID.snap.TIMESTRAMP
+- 源rbd image 上使用 export-diff 命令导出从刚开始创建时到上一步快照时的差异数据，其实就是现在整个rbd的数据，然后通过管道将差量数据导入刚刚在备份集群上新创建的base image中
+
+### 再次备份
+
+- 在要备份的源volume 中找到满足 r"^backup\.([a-z0-9\-]+?)\.snap\.(.+)$" 的最近一次快照。
+- 源volume 创建一个新的快照，name 形式为 backup.BACKUP_ID.snap.TIMESTRAMP。
+- 源rbd image 上使用 export-diff 命令导出与最近的一次快照比较的差量数据，然后通过管道将差量数据导入到备份集群的rbd image中
+
+恢复时相反，只需要从备份集群找出对应的快照并导出差量数据，导入到原volume即可
+
 
 
 
