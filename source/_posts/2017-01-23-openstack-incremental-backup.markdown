@@ -21,6 +21,7 @@ tags: openstack
 
 - 备份作为一种常见的容灾机制，是系统设计中不可或缺的一环，openstack自然也不例外，本文列举了一些opensatck中常见的snapshot,backup等操作。
 - 重点讨论nova,cinder。其他备份比如trove不再考虑
+- 简单谈一下快照与备份的区别，快照保存的是瞬时数据，依赖于源数据，主要用于做重要升级之前先做个snapshot，以备出现差错回滚。备份主要是为了容灾，不依赖于源数据，且一般备份数据在不同数据中心。
 
 
 
@@ -65,11 +66,10 @@ tags: openstack
 
 - 命令 cinder backup-create 
 - cinder支持多种backend,对全量备份，增量备份的支持也不尽相同，这里只讨论以ceph rbd 作为backend的情况，其他的backend可以参考这里，[Openstack 中cinder backup三种backend的对比](http://blog.csdn.net/wytdahu/article/details/45246095)- 使用 rbd作为后端，支持全量备份和增量备份。backup-create时先尝试创建增量备份，如果不成功，会创建全量备份，不需要指明专门的参数。
-- 原理可以看看这篇, [Openstack 中cinder backup三种backend的对比](http://blog.csdn.net/wytdahu/article/details/45246095)。        
+- 参考这篇, [cinder-backup 利用ceph实现增量备份](https://zhangchenchen.github.io/2017/05/09/openstack-cinder-incremental-backup-with-ceph/)。        
 
 
 
-## 未完待续 
 
 
 
