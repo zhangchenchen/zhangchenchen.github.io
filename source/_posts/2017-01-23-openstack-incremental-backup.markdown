@@ -55,10 +55,7 @@ tags: openstack
 
 - 命令为 cinder snapshot-create 同nova volume-snapshot-create一样效果。除了create,还有其他list,delete,metadata等命令。
 - 可以用snapshot 对volume进行恢复，见示例[Openstack - Cinder Snapshot/Restore](http://qiita.com/idzzy/items/cfb568e83e2645e3f32e)  
-- 如果cinder使用rbd作为后端存储，那么这时候的snapshot 便是利用rbd snapshot来实现的，关于ceph rbd snapshot的实现原理，参考[]()
-
-
-
+- 如果cinder使用rbd作为后端存储，那么这时候的snapshot 便是利用rbd snapshot来实现的，关于ceph rbd snapshot的实现原理，参考[ceph-- ceph rbd快照的实现原理](https://zhangchenchen.github.io/2017/06/05/ceph-rbd-snapshot/)
 
 
 
