@@ -36,7 +36,7 @@ tags: other
 new_post_name: :year-:month-:day-:title.md
 ```
 4. 修改blog中的部分md格式，比如代码高亮格式等。
-5. 下载 next theme 到themes文件夹，并配置该theme，参考[next theme](http://theme-next.iissnan.com/getting-started.html)。注意如果是使用git clone下来的，那么会存在两个远程分支（github page 一个，next theme一个），容易出错，所以最好还是直接下载下来放到themes文件夹。
+5. 下载 next theme 到themes文件夹，并配置该theme，参考[next theme](http://theme-next.iissnan.com/getting-started.html)。注意如果是使用git clone下来的，那么会存在两个远程分支（github page 一个，next theme一个），容易出错，所以最好还是直接下载下来放到themes文件夹（当然，也可以使用git submodules来管理）。
 6. git bash 中运行依次 hexo g （生成静态文件），hexo s（启动本地服务器） ，然后本地查看。
 7. 接下来需要将blog部署到github pages。因为我需要在家里和公司的电脑进行博客的更新，所以涉及到一个协作的问题。github page 上面挂的都是一些静态的文件，而如果修改主题或者配置的话，就没法做到同步了。搜了一下，知乎上找到一个比较完美的解决方案，通过创建两个分支来解决，参考[使用hexo，如果换了电脑怎么更新博客？](https://www.zhihu.com/question/21193762)。
 
