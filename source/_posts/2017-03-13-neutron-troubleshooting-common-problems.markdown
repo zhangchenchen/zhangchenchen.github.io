@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "neutron-- 对neutron一些常见网络问题的troubleshooting"
+title:  "openstack-- 对neutron一些常见网络问题的troubleshooting"
 date:   2017-03-13 11:10:32
 tags: 
   - openstack

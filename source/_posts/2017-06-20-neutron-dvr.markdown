@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "neutron-- neutron 分布式虚拟路由（DVR）"
+title:  "openstack-- neutron 分布式虚拟路由（DVR）"
 date:   2017-06-20 14:30:32
 tags: 
   - openstack
