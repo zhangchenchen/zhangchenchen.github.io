@@ -34,7 +34,7 @@ Cobbler 是典型的CS架构，我们只需要在服务端做好相应的安装�
 
 参照 官网[Red Hat Entperise Linux](https://cobbler.github.io/manuals/2.6.0/2/2/2_-_RHEL_and_CentOS.html)
 
-注：y安装需要用到 epel源，因为是Centos，只需 yum install epel-release 即可。
+注：安装需要用到 epel源，因为是Centos，只需 yum install epel-release 即可。
 
 ### Cobbler 配置
 
@@ -64,7 +64,7 @@ cobbler import --name=centos7 --arch=x86_64 --path=/mnt
 ### 遇到的问题
 
 - TFTP Timed out : guest#1的TFTP Server 没有启动造成。
-- failed to start switch root：TO BE CONTINUED
+- failed to start switch root：[dracut cant locate /dev/root](https://www.centos.org/forums/viewtopic.php?t=57419)
 
 ## 参考文章
 
