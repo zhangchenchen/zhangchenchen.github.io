@@ -224,4 +224,7 @@ v2版本对用户的权限管理以每一个用户为单位，需要对每一个
 
 [OpenStack DocumentationAppendix Firewalls and default ports](https://docs.openstack.org/kilo/config-reference/content/firewalls-default-ports.html)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

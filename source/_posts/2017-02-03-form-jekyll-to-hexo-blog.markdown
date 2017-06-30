@@ -54,4 +54,7 @@ new_post_name: :year-:month-:day-:title.md
 
 [使用hexo，如果换了电脑怎么更新博客？](https://www.zhihu.com/question/21193762)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

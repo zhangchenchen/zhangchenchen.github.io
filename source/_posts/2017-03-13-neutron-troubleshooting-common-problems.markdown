@@ -151,4 +151,7 @@ debug步骤：
 
 [Neutron 理解（5）：Neutron 是如何向 Nova 虚机分配固定IP地址的 （How Neutron Allocates Fixed IPs to Nova Instance）](http://www.cnblogs.com/sammyliu/p/4419195.html)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

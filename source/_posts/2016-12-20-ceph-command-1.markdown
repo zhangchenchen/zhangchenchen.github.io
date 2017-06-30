@@ -184,4 +184,7 @@ ceph 中的服务包含 OSD ,MON两种，对这些服务的操作也无非是sto
 [集群运维--ceph doc](http://docs.ceph.org.cn/rados/operations/)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

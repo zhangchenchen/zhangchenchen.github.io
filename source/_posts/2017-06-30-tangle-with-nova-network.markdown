@@ -79,6 +79,7 @@ Flat类型的基本上上文已经讲了，主要看下flatDHCP 的实现：
 但也不是nova-network 就一文不取，相比于neutron网络，虽说没有neutron那么多的功能插件，仅有bridge，但是其稳定性已得到大多数用户的验证，对于小规模的私有云(1千台虚机的规模)，nova-network是可以考虑的。
 
 
+
 ## 参考文章
 
 
@@ -93,5 +94,8 @@ Flat类型的基本上上文已经讲了，主要看下flatDHCP 的实现：
 [openstack 网络架构 nova-network + neutron](http://blog.csdn.net/beginning1126/article/details/41172365)
 
 [UnderstandingFlatNetworking](https://wiki.openstack.org/wiki/UnderstandingFlatNetworking)
+
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
 
  ***END***

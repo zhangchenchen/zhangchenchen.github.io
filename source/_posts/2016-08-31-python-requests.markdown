@@ -178,4 +178,7 @@ requests包要完成的内容无非就是发送和接收http请求。接下来�
 [Python HTTP 库：requests 快速入门](http://liam0205.me/2016/02/27/The-requests-library-in-Python/)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

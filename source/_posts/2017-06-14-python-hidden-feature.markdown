@@ -237,4 +237,7 @@ with 语句在这里的作用是在调用with时，会调用这个文件实例�
 [Hidden features of Python ](https://stackoverflow.com/questions/101268/hidden-features-of-python#113198)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

@@ -136,4 +136,7 @@ ovs的常用子命令如下,直接引用自[OVS常用操作总结](http://fishcr
 
 [OVS常用操作总结](http://fishcried.com/2016-02-09/openvswitch-ops-guide/)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

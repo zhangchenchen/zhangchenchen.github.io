@@ -324,4 +324,7 @@ reactor 系统会结合sls文件在master端去匹配event tags，匹配成功�
 [Saltstack自动化（五）sls文件使用](http://www.361way.com/salt-states/5350.html)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

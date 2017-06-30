@@ -315,4 +315,7 @@ $ virt-resize --expand /dev/sda2 /data/images/win2012.qcow2 /data/images/win2012
 
 [libguestfs详解](http://www.hanbaoying.com/2017/02/26/libguestfs.html)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

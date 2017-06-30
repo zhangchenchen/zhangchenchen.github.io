@@ -119,4 +119,7 @@ swift API 的执行过程大致如下：swiftClient 将用户的命令转换为�
 
 [swift github](https://github.com/openstack/swift)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

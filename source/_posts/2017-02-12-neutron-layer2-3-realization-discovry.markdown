@@ -174,4 +174,7 @@ VXLAN 定义了一个 MAC-in-UDP 的封装格式。 在原始的 Layer 2 网络�
 [OVS vxlan 底层结构分析 - 每天5分钟玩转 OpenStack（148）](http://www.cnblogs.com/CloudMan6/p/6376523.html)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

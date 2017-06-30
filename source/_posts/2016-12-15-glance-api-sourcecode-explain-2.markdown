@@ -410,4 +410,7 @@ OK,对metedata的分析到这，再回去看下对image chunk data的处理,先�
 [openstack 设计与实现](https://book.douban.com/subject/26374647/)
 
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***

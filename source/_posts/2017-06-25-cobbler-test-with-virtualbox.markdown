@@ -79,4 +79,7 @@ cobbler import --name=centos7 --arch=x86_64 --path=/mnt
 
 [Testing out cobbler with virtuabox](http://www.webscalability.com/blog/2013/03/testing-out-cobbler-with-virtuabox/)
 
+ ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
  ***END***

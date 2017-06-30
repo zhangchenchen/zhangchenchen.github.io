@@ -120,4 +120,7 @@ task的status大致有：pending(task被创建，但未执行)，processing(task
 
 [wiki--glance-task-api](https://wiki.openstack.org/wiki/Glance-tasks-api)
 
-***END***
+***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
+
+
+ ***END***
