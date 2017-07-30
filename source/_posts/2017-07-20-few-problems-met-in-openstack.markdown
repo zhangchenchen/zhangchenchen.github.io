@@ -42,6 +42,8 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
  - sudo -u nova ssh-keygen   # 生成nova的密钥
  - ssh-copy-id nova@<serverIP> #复制公钥到目的节点
 
+ tips:复制公钥的过程中如果报错“This account is currently not available”，可能是因为用户nova的shell禁止登录了，修改/etc/passwd 中nova对应的shell登录部分由“/sbin /nologin”改成“/bin/bash”。
+
 
 ## ceph 节点资源耗尽
 

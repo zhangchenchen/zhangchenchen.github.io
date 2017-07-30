@@ -60,11 +60,25 @@ cobbler import --name=centos7 --arch=x86_64 --path=/mnt
 - 执行 cobbler sync命令
 - virtualbox 开启另一个虚拟机，一个网卡，设置为内部网络，adaptor type 为PC-Net III （为了PXE boot）。设置启动方式为网络启动优先。
 
+## Cobbler 常用命令行
+
+```bash
+$ cobbler list        #列出相关cobber元素(distros和profile)
+$ cobbler check       #检查cobbler配置(一般会提示需要进行怎样的配置)
+$ cobbler report      #列出cobbler的详细信息
+$ cobbler distro      #查看导入的相关系统发行版信息
+$ cobbler profile     #查看cobbler创建的相关pofile信息
+$ cobbler sync        #同步cobbler相关配置(最好每次执行完配置后都进行修改)
+$ cobbler reposync    #同步repo源
+
+```
 
 ### 遇到的问题
 
 - TFTP Timed out : guest#1的TFTP Server 没有启动造成。
 - failed to start switch root：[dracut cant locate /dev/root](https://www.centos.org/forums/viewtopic.php?t=57419)
+- 如果是某台机器需要重装系统的话，需要在该机器上安装koan，利用koan命令：koan --replace-self --server=10.45.249.102 --profile=rhel6.6-64-x86_64 进项镜像的拉取以及重装
+
 
 ## 参考文章
 
@@ -78,6 +92,8 @@ cobbler import --name=centos7 --arch=x86_64 --path=/mnt
 [自动化运维工具Cobbler](http://cuchadanfan.blog.51cto.com/9940284/1698348)
 
 [Testing out cobbler with virtuabox](http://www.webscalability.com/blog/2013/03/testing-out-cobbler-with-virtuabox/)
+
+[主机自动化部署之cobbler总结](http://www.bijishequ.com/detail/50880?p=)
 
  ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
 
