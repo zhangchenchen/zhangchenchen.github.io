@@ -55,6 +55,43 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
  - 在osd 再平衡期间，增加mon-osd-full-ratio/mon osd nearfull ratio值（未验证） 
 
 
+## Failed to allocate the network(s), not rescheduling.
+
+创建虚拟机的时候报如标题所述错误，查看详细日志，可以看出是Virtual Interface creation failed.
+
+![virtual-interface-fail](http://oeptotikb.bkt.clouddn.com/2017-08-09-CREATIO-INTERFACE-FAIL.png)
+
+自然想到可能是Virtual Interface 创建失败导致创建虚拟机失败，查看neutron-server日志，发现如下信息：
+```bash
+2017-08-09 11:21:08.499 154120 WARNING neutron.notifiers.nova [-] Nova returned NotFound for event: [{'tag': u'a653baaf-828d-4641-aabb-1a82c5163889', 'name': 'network-vif-deleted', 'server_uuid': u'4fdf7471-bece-4d93-       a044-a4052284c69b'}]
+
+```
+也就是说nova没有接受到network-vif-deleted的event，查看具体出错代码：
+
+```python
+    def _create_domain_and_network(self, context, xml, instance, network_info,
+                                   disk_info, block_device_info=None,
+                                   power_on=True, reboot=False,
+                                   vifs_already_plugged=False):
+       ...............................................................
+        except eventlet.timeout.Timeout:
+            # We never heard from Neutron
+            LOG.warn(_LW('Timeout waiting for vif plugging callback for '
+                         'instance %(uuid)s'), {'uuid': instance.uuid},
+                     instance=instance)
+            if CONF.vif_plugging_is_fatal:   #关键在这行
+                if guest:
+                    guest.poweroff()
+                self.cleanup(context, instance, network_info=network_info,
+                             block_device_info=block_device_info)
+                raise exception.VirtualInterfaceCreateException()
+```
+可以看到在nova-compute调用_create_domain_and_network函数的时候，会一直等待vif 的创建eventlet（由openvswitch-agent创建并返回evetlet），等待timeout时间之后，如果配置文件中vif_plugging_is_fatal=True,就会创建失败并回滚，如果vif_plugging_is_fatal=False就会略过。
+明白原理后就简单了，只需修改nova配置文件中vif_plugging_is_fatal=False就可以了，至于为什么nova没有收到eventlet，还有待深入。
+
+注：排错过程有个小插曲，我修改完配置文件后再重启nova-compute还是没效果，果断打断点调试，结果发现断点直接略过了，百思不得其解，折腾半天后，发现是有一个残留的nova-compute的进程一直在跑，kill掉之后，再启动就可以了。
+
+
 
 ## 参考文章
 
