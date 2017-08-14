@@ -65,6 +65,13 @@ Harbor共有五个组件，分别如下：
 
 ## Harbor 安装
 
+比较简单：
+
+1. 准备：python>=2.7, docker>=1.10, docker-compose>=1.6.0
+2. 下载离线安装包
+3. 修改配置文件 harbor.cfg
+4. 执行脚本install.sh 
+
 参考[Installation and Configuration Guide](https://github.com/vmware/harbor/blob/master/docs/installation_guide.md)
 
 

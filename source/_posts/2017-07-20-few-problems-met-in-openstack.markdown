@@ -87,7 +87,7 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
                 raise exception.VirtualInterfaceCreateException()
 ```
 可以看到在nova-compute调用_create_domain_and_network函数的时候，会一直等待vif 的创建eventlet（由openvswitch-agent创建并返回evetlet），等待timeout时间之后，如果配置文件中vif_plugging_is_fatal=True,就会创建失败并回滚，如果vif_plugging_is_fatal=False就会略过。
-明白原理后就简单了，只需修改nova配置文件中vif_plugging_is_fatal=False就可以了，至于为什么nova没有收到eventlet，还有待深入。
+明白原理后就简单了，只需修改nova配置文件中vif_plugging_is_fatal=False就可以了，至于为什么nova没有收到eventlet，还有待深入。这一部分可以参考[nova network-vif-plugged事件分析1](http://blog.csdn.net/bc_vnetwork/article/details/52231418).
 
 注：排错过程有个小插曲，我修改完配置文件后再重启nova-compute还是没效果，果断打断点调试，结果发现断点直接略过了，百思不得其解，折腾半天后，发现是有一个残留的nova-compute的进程一直在跑，kill掉之后，再启动就可以了。
 
@@ -107,6 +107,8 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
 [HANDLING A FULL CEPH FILESYSTEM](http://docs.ceph.com/docs/master/cephfs/full/)
 
 [Ceph集群磁盘没有剩余空间的解决方法](http://xiaoquqi.github.io/blog/2015/05/12/ceph-osd-is-full/)
+
+[nova network-vif-plugged事件分析1](http://blog.csdn.net/bc_vnetwork/article/details/52231418)
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
 
