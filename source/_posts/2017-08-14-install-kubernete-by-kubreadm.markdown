@@ -12,6 +12,7 @@ tags:
 - 利用 kubeadm 搭建一个四节点的k8s测试集群
 - 利用harbor搭建一个单节点的私有镜像仓库
 - k8s集群与私有镜像仓库整合
+- 部署dashboard
 
 ## 前期准备
 
@@ -142,7 +143,7 @@ for imageName in ${images[@]} ; do
 done
 ```
 
-如果不能翻墙，可以先翻墙下载下来，然后上传到dockerhub上，再下载下来。
+如果不能翻墙，可以先翻墙下载下来，然后push到dockerhub上，再pull下来,注意pull下来之后，还是要更改tag为gcr.io/google_containers/$imageName形式。
 
 
 ### master 节点安装
@@ -239,7 +240,35 @@ k8s-node3.novalocal    Ready          4d
 
 ```bash
 kubectl create secret docker-registry myregistrykey --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL
+
+kubectl get secret --all-namespaces   #查看创建的secret
 ```
+
+在写dockerfile的时候指定imagePullSecrets即可，示例如下：
+
+```bash
+# cat ./deployment-with-secret.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-deployment-from-harbor
+  namespace: kube-public
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx-for-test
+    spec:
+      containers:
+      - name: nginx-for-test
+        image: 172.16.21.253:10080/aisino-lib/docker.io/nginx:latest
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: harbor-k8s-secret
+```
+
 
 - 通过secret yaml文件创建pull image所用的secret,其实跟上述方法类似，不过是用yaml文件创建的secret.
 
@@ -261,6 +290,92 @@ type: kubernetes.io/dockerconfigjson
 kubectl create -f myregistrykey.yaml
 ```
 
+secret使用方式与第二种方式一样，不过kubectl和yaml创建的两个secret的类型略有不同，前者是kubernetes.io/dockercfg，后者是kubernetes.io/dockerconfigjson。
+
+
+## 部署dashboard
+
+
+由[README](https://github.com/kubernetes/dashboard) 文件可知，有两种部署方式，如果是没有安装RBAC权限控制的，可以执行
+
+```bash
+kubectl create -f https://git.io/kube-dashboard
+```
+
+如果有RBAC的，可以执行：
+
+```bash
+kubectl create -f https://git.io/kube-dashboard-no-rbac
+```
+kubeadm安装方式自从1.6+版之后自动安装RBAC，所以需要选择第二种。如果权限问题依旧（注：一般是报错serviceaccount:kube-system:default" cannot list statefulsets.apps in the namespace "default".）可以根据该[issue](https://github.com/kubernetes/dashboard/issues/1803),添加一个权限。
+
+```bash
+# cat dashboard-rbac.yml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: dashboard-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin 
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system
+
+# kubectl create -f dashboard-rbac.yml
+```
+
+注：如果想外部可以直接访问dashboard，需要修改下dockfile文件，将最后的service配置修改为nodePort,示例如下：
+
+```bash
+.......................
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: kubernetes-dashboard
+  name: kubernetes-dashboard
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - nodePort: 30002
+    port: 80
+    targetPort: 9090
+  selector:
+    k8s-app: kubernetes-dashboard
+
+```
+
+这样便可以直接http://NODEIP:30002访问。关于port，nodePort, targetPort,可以参考[kubernetes中port、target port、node port的对比分析，以及kube-proxy代理](http://blog.csdn.net/xinghun_4/article/details/50492041)
+
+
+## 部署Heapster 监控与统计
+
+Heapster是一个容器集群监控和性能分析工具，天然支持Kubernetes和CoreOS。
+这里使用influxDB作为Heapster的后端存储部署，参考[安装文档](https://github.com/kubernetes/heapster/blob/master/docs/influxdb.md).
+首先下载对应版本的相关dockerfile文件：
+
+```bash
+wget https://github.com/kubernetes/heapster/archive/v1.3.0.tar.gz
+```
+
+解压并直接部署即可：
+
+```bash
+tar -zxvf v1.3.0.tar.gz
+cd heapster-1.3.0/deploy/kube-config/influxdb
+
+kubectl create -f ./*
+```
+
+该过程会pull相关镜像，同样，可以先翻墙pull下来再push到私有镜像仓库再使用。
+最终完成后，所有pods都running,可以看到dashboard的界面多了仪表盘。
+
+![dashboard](http://oeptotikb.bkt.clouddn.com/2017-08-16-dashboard.png)
 
 
 ## 参考文章
@@ -270,7 +385,7 @@ kubectl create -f myregistrykey.yaml
 
 [CentOS 7 安装Kubernetes 1.5.3 集群(本地安装)](http://yoyolive.com/2017/02/27/Kubernetes-1-5-3-Local-Install/)
 
-[Kubernetes从Private Registry中拉取容器镜像的方法]http://tonybai.com/2016/11/16/how-to-pull-images-from-private-registry-on-kubernetes-cluster/?utm_source=rss)
+[Kubernetes从Private Registry中拉取容器镜像的方法](http://tonybai.com/2016/11/16/how-to-pull-images-from-private-registry-on-kubernetes-cluster/?utm_source=rss)
 
 [k8s-doc-Images](https://kubernetes.io/docs/concepts/containers/images/#using-a-private-registry)
 
