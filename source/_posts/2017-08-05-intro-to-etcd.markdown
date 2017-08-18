@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Kubernete-- 关于ETCD && 服务发现的一些记录"
+title:  "Kubernetes-- 关于ETCD && 服务发现的一些记录"
 date:   2017-08-05 14:28:00
 tags: 
-  - Kubernete
+  - kubernetes
   - ETCD
 ---
 
@@ -11,9 +11,6 @@ tags:
 ##  ETCD简介
 
 TO BE CONTINUED
-
-## Harbor 架构与原理
-
 
 
 

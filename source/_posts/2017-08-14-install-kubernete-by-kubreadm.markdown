@@ -3,7 +3,7 @@ layout: post
 title:  "Kubernete-- 利用kubeadm 搭建一个kubernate集群"
 date:   2017-08-14 15:38:10
 tags: 
-  - kubernete
+  - kubernetes
 ---
 
 
@@ -327,7 +327,7 @@ subjects:
 # kubectl create -f dashboard-rbac.yml
 ```
 
-注：如果想外部可以直接访问dashboard，需要修改下dockfile文件，将最后的service配置修改为nodePort,示例如下：
+注：如果想外部可以直接访问dashboard，需要修改下yaml文件，将最后的service配置修改为nodePort,示例如下：
 
 ```bash
 .......................
@@ -357,7 +357,7 @@ spec:
 
 Heapster是一个容器集群监控和性能分析工具，天然支持Kubernetes和CoreOS。
 这里使用influxDB作为Heapster的后端存储部署，参考[安装文档](https://github.com/kubernetes/heapster/blob/master/docs/influxdb.md).
-首先下载对应版本的相关dockerfile文件：
+首先下载对应版本的相关yaml文件：
 
 ```bash
 wget https://github.com/kubernetes/heapster/archive/v1.3.0.tar.gz
