@@ -69,7 +69,7 @@ https://github.com/rancher/rancher/issues/7436)。
 yum install -y ebtables socat
 ```
 
-kubectl 的安装比较简单，参考[Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/),可以直接下载可执行文件然后添加权限，扔到master节点的/usr/local/bin/目录下即可，注意版本要与k8s版本匹配。
+kubectl 的安装比较简单，参考[Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/),可以直接下载可执行文件然后添加权限，扔到master节点的/usr/local/bin/目录下即可，注意版本要与k8s版本匹配(注：也可以直接在下文同其他三个组件一起rpm包安装)。
 
 ```bash
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -118,7 +118,7 @@ https://packages.cloud.google.com/yum/pool/e7a4403227dd24036f3b0615663a371c4e07a
 ```bash
 tar xzvf /tmp/kubernetes-el7-x86_64.tar.gz
 kubernetes-el7-x86_64/
-kubernetes-el7-x86_64/567600102f687e0f27bd1fd3d8211ec1cb12e71742221526bb4e14a412f4fdb5-kubernetes-cni-0.3.0.1-0.07a8a2.x86_64.rpm
+kubernetes-el7-x86_64/567600102f687e0f27bd1fd3d8211ec1cb12e71742221526bb4e14a412f4fdb5-kubernetes-cni-0.5.0.1-0.07a8a2.x86_64.rpm
 kubernetes-el7-x86_64/5612db97409141d7fd839e734d9ad3864dcc16a630b2a91c312589a0a0d960d0-kubeadm-1.6.0-0.alpha.0.2074.a092d8e0f95f52.x86_64.rpm
 kubernetes-el7-x86_64/8a299eb1db946b2bdf01c5d5c58ef959e7a9d9a0dd706e570028ebb14d48c42e-kubelet-1.5.1-0.x86_64.rpm
 kubernetes-el7-x86_64/93af9d0fbd67365fa5bf3f85e3d36060138a62ab77e133e35f6cadc1fdc15299-kubectl-1.5.1-0.x86_64.rpm
@@ -154,6 +154,7 @@ done
 kubeadm init
 ```
 执行完成后，会输出一个token，node节点安装时会用到。
+这里有一个小坑：该过程一直卡在“[apiclient] Created API client, waiting for the control plane to become ready” ，可以去message里找相关log，一般是两种情况导致，一种是用了proxy，一种是[cgroup-driver配置错误](https://github.com/kubernetes/kubernetes/issues/43800)，我这边有一次是因为下载的镜像不对，kubeadm默认应该是安转最新版本，比如kubeadm1.6.x会安装1.6.9的相关组件（api-server-1.6.9.controller-manager-1.6.9等），而kubeadm1.7.x会默认安装1.7.x里面的最高版本（此时是1.7.4），所以要下载合适版本的镜像。
 
 
 ### node 节点安装
@@ -161,7 +162,7 @@ kubeadm init
 在各node节点执行：
 
 ```bash
- kubeadm join --token=976234.e91451d4305bc282 172.16.21.53 # node IP
+ kubeadm join --token=976234.e91451d4305bc282 172.16.21.53 
 ```
 
 全部执行完成后，在master节点验证：

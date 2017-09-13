@@ -11,7 +11,7 @@ tags:
 
 k8s的HA相对于[openstack的HA](https://zhangchenchen.github.io/2017/04/14/openstack-ha/)要简单很多，主要包括以下三各方面：
 
-- etcd的HA:创建HA集群
+- etcd的HA:创建HA集群,如果还不放心，可以使用分布式存储系统
 - apiserver(无状态服务)的HA:双活模式，前面加一个load balance
 - controller manager 和 scheduler的HA:主备模式。
 
