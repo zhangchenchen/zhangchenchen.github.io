@@ -179,6 +179,8 @@ Grafana也提供rest api，url 的构建同上，可以参考[HTTP API Reference
 
 ![grafana-ui](http://oeptotikb.bkt.clouddn.com/grafana-20171101154016.jpg)
 
+通过该UI界面，设置查询SQL，就可以定制自己需要的图表，参考[How to Utilize the “Heapster + InfluxDB + Grafana” Stack in Kubernetes for Monitoring Pods](https://blog.kublr.com/how-to-utilize-the-heapster-influxdb-grafana-stack-in-kubernetes-for-monitoring-pods-4a553f4d36c9)
+
 ## 参考文章
 
 
