@@ -140,6 +140,54 @@ Best-Effort pods -> Burstable pods -> Guaranteed pods
 - Guaranteed pods：系统用完了全部内存、且没有Burstable与Best-Effort container可以被kill，该类型的pods会被kill掉。
 注：如果pod进程因使用超过预先设定的limites而非Node资源紧张情况，系统倾向于在其原所在的机器上重启该container或本机或其他重新创建一个pod。
 
+具体到k8s的配置中，大致要配置两个地方，一个是namesapce中所有容器的cpu/内存的总和request和limit，另一个是namespace中默认的容器cpu/内存的request，limit值(在容器创建时没有指定request，limit时使用默认值)。这两类资源一个叫做ResourceQuota，一个叫做LimitRange ，参考示例：
+
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+      cpu: 1
+    defaultRequest:
+      memory: 256Mi
+      cpu: 0.5
+    type: Container
+```
+
+以上为一个LimitRange的yaml文件，指定namespace并创建：
+```bash
+kubectl create -f limitrange-defaults.yaml --namespace=default
+```
+当在创建pod的时候，如果没有指定具体的request和limit，就会按照默认值。
+
+再创建一个ResourceQuota：
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mem-cpu-demo
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    persistentvolumeclaims: "1"
+    services.loadbalancers: "2"
+    services.nodeports: "10"
+```
+
+同样，指定namespace并创建，
+```bash
+kubectl create -f resourcequota-default.yaml --namespace=default
+```
+由配置文件可以看出，除了指定cpu/内存的request和limit，还可以指定pod数量以及其他一些api resource的数量。
+更多示例参考[Manage Memory, CPU, and API Resources](https://k8smeetup.github.io/docs/tasks/administer-cluster/memory-default-namespace/)
 
 
 ## 参考文章
@@ -159,6 +207,8 @@ Best-Effort pods -> Burstable pods -> Guaranteed pods
 [Configure Quality of Service for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/)
 
 [resource-qos.md](https://github.com/eBay/Kubernetes/blob/master/docs/proposals/resource-qos.md)
+
+[Manage Memory, CPU, and API Resources](https://k8smeetup.github.io/docs/tasks/administer-cluster/memory-default-namespace/)
 
 
 
