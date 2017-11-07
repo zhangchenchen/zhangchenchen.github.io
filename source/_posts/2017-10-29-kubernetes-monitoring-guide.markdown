@@ -7,6 +7,9 @@ tags:
 ---
 
 
+关于k8s的监控，官方文档有一个系列[Kubernetes: a monitoring guide](http://blog.kubernetes.io/2017/05/kubernetes-monitoring-guide.html),涵盖了大部分内容，如果觉得费时可以直接参阅[这篇文章](https://blog.ruhm.me/post/kubernetes-monitoring/),本文主要是偏重Heapster & InfluxDB & Grafana 方案的实践。
+
+
 ## Heapster & InfluxDB & Grafana 
 
 Heapster & InfluxDB & Grafana的组合是kubernetes监控的官方推荐组合，官方dashboard的概览中就用到了这三个工具来展示监控数据。这三个组合中，
@@ -181,6 +184,10 @@ Grafana也提供rest api，url 的构建同上，可以参考[HTTP API Reference
 
 通过该UI界面，设置查询SQL，就可以定制自己需要的图表，参考[How to Utilize the “Heapster + InfluxDB + Grafana” Stack in Kubernetes for Monitoring Pods](https://blog.kublr.com/how-to-utilize-the-heapster-influxdb-grafana-stack-in-kubernetes-for-monitoring-pods-4a553f4d36c9)
 
+
+以上就是Heapster & InfluxDB & Grafana 实现k8s监控的内容，这套方案的优点就是部署简单，与k8s结合的很好，缺点也比较明显，heapster是专为k8s设计的，没有通用性，且没有alert机制（当然可以通过设置grafana，但是需要自己做镜像）。除了这一套方案外 ，还有一种广泛使用的方案：prometheus + Grafana，这套方案相对比较通用，除了k8s还可以对接其他系统（比如运行在k8s里面的数据库集群等），且有报警模块alertmanager，缺点就是配置相对比较麻烦，不过为了以后的方便，还是建议采用这种方案。
+ 
+
 ## 参考文章
 
 
@@ -194,6 +201,9 @@ Grafana也提供rest api，url 的构建同上，可以参考[HTTP API Reference
 
 [使用Heapster获取kubernetes集群对象的metric数据](https://jimmysong.io/posts/using-heapster-to-get-object-metrics/)
 
+[UBERNETES 集群监控方案研究](https://blog.ruhm.me/post/kubernetes-monitoring/)
+
+[使用Prometheus完成Kubernetes集群监控](https://jishu.io/kubernetes/kubernetes-monitoring-with-prometheus/)
 
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
