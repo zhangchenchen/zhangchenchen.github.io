@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "kubernetes-- kubernetes 监控指南"
+title:  "kubernetes-- kubernetes 监控指南（一）"
 date:   2017-10-29 18:03:10
 tags: 
   - kubernetes
@@ -186,7 +186,7 @@ Grafana也提供rest api，url 的构建同上，可以参考[HTTP API Reference
 
 
 以上就是Heapster & InfluxDB & Grafana 实现k8s监控的内容，这套方案的优点就是部署简单，与k8s结合的很好，缺点也比较明显，heapster是专为k8s设计的，没有通用性，且没有alert机制（当然可以通过设置grafana，但是需要自己做镜像）。除了这一套方案外 ，还有一种广泛使用的方案：prometheus + Grafana，这套方案相对比较通用，除了k8s还可以对接其他系统（比如运行在k8s里面的数据库集群等），且有报警模块alertmanager，缺点就是配置相对比较麻烦，不过为了以后的方便，还是建议采用这种方案。
- 
+
 
 ## 参考文章
 
