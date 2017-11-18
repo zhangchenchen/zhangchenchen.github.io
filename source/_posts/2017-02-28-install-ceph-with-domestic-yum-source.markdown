@@ -33,10 +33,10 @@ $ sudo hostnamectl --static set-hostname <host-name>
 $ wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS7-Base-163.repo
 ```
 
-- 更换epel源为上海交大的源(注：随着版本更迭，以下链接可能会失效，如果出现404错误，那就需要更改链接)：
+- 更换epel源为中科大的源(注：随着版本更迭，以下链接可能会失效，如果出现404错误，那就需要更改链接)：
 
 ```bash
-$ rpm -Uvh http://ftp.sjtu.edu.cn/fedora/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
+$ rpm -Uvh  http://mirrors.ustc.edu.cn/centos/7/extras/x86_64/Packages/epel-release-7-9.noarch.rpm
 
 $ rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
 
