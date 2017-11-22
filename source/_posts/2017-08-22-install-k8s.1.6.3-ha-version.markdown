@@ -42,7 +42,7 @@ k8s的HA相对于[openstack的HA](https://zhangchenchen.github.io/2017/04/14/ope
 
 ## Kubernetes Master集群部署
 
-我们这里用openstack创建了一个load balance用于apiserver的高可用，如果实在裸机上，可以使用haproxy+keepalived的方案实现。
+我们这里用openstack创建了一个load balance用于apiserver的高可用，如果是在裸机上，也有多种方案，比如，可以使用haproxy+keepalived的方案实现，也可以直接在各节点用nginx做反向代理，参考[kubernetes(k8s) 1.7.3 calico网络和Master ha安装说明](https://www.centos.bz/2017/08/k8s-kubernetes-1-7-3-calico-master-ha/#配置 KubeDNS)。
 
 ## Kubernetes Node节点部署
 
@@ -68,6 +68,8 @@ This means that your 'apache' container can die, and come back to life, and all 
 [Kubernetes 1.6 高可用集群部署](http://blog.frognew.com/2017/04/install-ha-kubernetes-1.6-cluster.html#42-kubelet部署)
 
 [ssl 双向认证和单向认证原理](http://www.cnblogs.com/Michael-Kong/archive/2012/08/16/SSL%E8%AF%81%E4%B9%A6%E5%8E%9F%E7%90%86.html)
+
+[kubernetes(k8s) 1.7.3 calico网络和Master ha安装说明](https://www.centos.bz/2017/08/k8s-kubernetes-1-7-3-calico-master-ha/#配置 KubeDNS)
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
 

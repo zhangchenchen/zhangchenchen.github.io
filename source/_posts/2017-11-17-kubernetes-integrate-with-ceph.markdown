@@ -175,7 +175,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
  name: ceph-claim-dynamic
- namespace: galera
+ namespace: test-ceph
 spec:
  accessModes:
     - ReadWriteOnce
@@ -245,12 +245,152 @@ spec:
 
 ### 实战：创建一个mysql-galera集群
 
+在进入具体实战之前，先介绍一下k8s针对有状态服务推出的一个组件，statefulset(1.5之前叫做petset),statefulset与deployment,replicasets是一个级别的。不过Deployments和ReplicaSets是为无状态服务而设计。statefulset则是为了解决有状态服务的问题。它的应用场景如下：
+- 稳定的持久化存储，即Pod重新调度后还是能访问到相同的持久化数据，基于PVC来实现
+- 稳定的网络标志，即Pod重新调度后其PodName和HostName不变，基于Headless Service（即没有Cluster IP的Service）来实现。
+- 有序部署，有序扩展，即Pod是有顺序的，在部署或者扩展的时候要依据定义的顺序依次依次进行（即从0到N-1，在下一个Pod运行之前所有之前的Pod必须都是Running和Ready状态），基于init containers来实现。
+- 有序收缩，有序删除（即从N-1到0）。
 
+由应用场景可知，statefuleset特别适合mqsql,redis等数据库集群。相应的，一个statefuleset有以下三个部分：
+- 用于定义网络标志（DNS domain）的Headless Service
+- 用于创建PersistentVolumes的volumeClaimTemplates
+- 定义具体应用的StatefulSet
+
+以下是从github上找到的一个示例dockerfile:
+
+
+首先创建headless service：
+
+galera-service.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  name: galera
+  namespace: galera
+  labels:
+    app: mysql
+spec:
+  ports:
+  - port: 3306
+    name: mysql
+  # *.galear.default.svc.cluster.local
+  clusterIP: None
+  selector:
+    app: mysql
+
+```
+
+创建statefulset，这里存储直接用的storageclass指定ceph rbd,镜像下载需要科学上网。
+
+```yaml
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: galera
+spec:
+  serviceName: "galera"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+      - name: install
+        image: gcr.io/google_containers/galera-install:0.1
+        imagePullPolicy: Always
+        args:
+        - "--work-dir=/work-dir"
+        volumeMounts:
+        - name: workdir
+          mountPath: "/work-dir"
+        - name: config
+          mountPath: "/etc/mysql"
+      - name: bootstrap
+        image: debian:jessie
+        command:
+        - "/work-dir/peer-finder"
+        args:
+        - -on-start="/work-dir/on-start.sh"
+        - "-service=galera"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: workdir
+          mountPath: "/work-dir"
+        - name: config
+          mountPath: "/etc/mysql"
+      containers:
+      - name: mysql
+        image: gcr.io/google_containers/mysql-galera:e2e
+        ports:
+        - containerPort: 3306
+          name: mysql
+        - containerPort: 4444
+          name: sst
+        - containerPort: 4567
+          name: replication
+        - containerPort: 4568
+          name: ist
+        args:
+        - --defaults-file=/etc/mysql/my-galera.cnf
+        - --user=root
+        readinessProbe:
+          # TODO: If docker exec is buggy just use gcr.io/google_containers/mysql-healthz:1.0
+          exec:
+            command:
+            - sh
+            - -c
+            - "mysql -u root -e 'show databases;'"
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 2
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/
+        - name: config
+          mountPath: /etc/mysql
+      volumes:
+      - name: config
+        emptyDir: {}
+      - name: workdir
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "ceph-web"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+结果如下：
+
+```bash
+[root@seed galera-cluster]# kubectl get pods  -n galera
+NAME                             READY     STATUS    RESTARTS   AGE
+mysql-0                          1/1       Running   0          47m
+mysql-1                          1/1       Running   0          24m
+mysql-2                          1/1       Running   0          2m
+```
 
 
 ## 参考文章
 
 [kubernetes Ceph RBD](https://jicki.me/2017/05/09/kubernetes-ceph-rbd/#ceph-mon-)
+
+[Dynamic Provisioning and Storage Classes in Kubernetes](http://blog.kubernetes.io/2017/03/dynamic-provisioning-and-storage-classes-kubernetes.html)
 
 [使用Ceph RBD为Kubernetes集群提供存储卷](http://tonybai.com/2016/11/07/integrate-kubernetes-with-ceph-rbd/)
 
@@ -258,6 +398,9 @@ spec:
 
 [Error creating rbd image: executable file not found in $PATH ](https://github.com/kubernetes/kubernetes/issues/38923)
 
+[MySQL on Docker: Running Galera Cluster on Kubernetes](https://severalnines.com/blog/mysql-docker-running-galera-cluster-kubernetes)
+
+[StatefulSet](https://jimmysong.io/kubernetes-handbook/concepts/statefulset.html)
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
 
