@@ -375,7 +375,11 @@ spec:
           storage: 1Gi
 ```
 
-结果如下：
+以上涉及到三个镜像，前两个镜像在initContainers 下，表示这两个镜像创建的是Init Container，顾名思义，就是完成一些初始化的工作。这些 Init Container 按照定义的顺序依次执行，只有所有的Init Container 执行完后，主容器才启动。由于一个Pod里的存储卷是共享的，所以 Init Container 里产生的数据可以被主容器使用到。
+这里两个initcontainer主要完成以下两个工作：安装mysql-galera等组件,生成配置文件等。
+
+
+最终结果如下：
 
 ```bash
 [root@seed galera-cluster]# kubectl get pods  -n galera

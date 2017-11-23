@@ -949,6 +949,84 @@ spec:
 
 这样，所有的工作基本完成，接下来就是根据自己的需求进行监控的配置调整，比如grafana面板的管理，报警的具体要求，阈值等。
 
+## ------- 更新 ------2017-11-23-----增加ceph监控
+
+我司容器云平台后端存储使用的ceph,花了一点时间将ceph的监控转到prometheus上，并找了一个不错的grafana模板，最终效果（实验环境）如下：
+
+![grafana-cepg-cluster](http://oeptotikb.bkt.clouddn.com/20171123-grafana-ceph-cluster.jpg)
+
+![grafana-ceph-osd](http://oeptotikb.bkt.clouddn.com/20171123-ceph-osd.jpg)
+
+简单叙述下具体过程：
+
+### 部署 ceph-exporter
+
+[ceph-exporter](https://github.com/digitalocean/ceph_exporter)是digitalocean开源的一个获取ceph metric的工具，可以直接在某一台物理机上部署，也可以pod形式部署。我们这里使用pod形式部署，yaml文件如下：
+
+ceph-exporter-deployment.yaml
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ceph-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ceph-exporter
+    spec:
+      containers:
+        - name: ceph-exporter
+          image: digitalocean/ceph_exporter
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /etc/ceph
+            name: ceph-conf
+      volumes:
+      - hostPath:
+          path: /etc/ceph
+        name: ceph-conf
+```
+
+创建service：
+
+ceph-exporter-svc.yaml
+```yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+  labels:
+    app: ceph-exporter
+    k8s-app: ceph-exporter
+  name: ceph-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: ceph-exporter
+    port: 9128
+    protocol: TCP
+    targetPort: 9128
+  selector:
+    app: ceph-exporter
+```
+
+注意：service配置文件中prometheus.io/scrape: 'true' ，表示该service可以被prometheus 抓取到。
+
+部署完成后，到prometheus 的target页面查看是否能被prometheus 抓取。
+
+![prometheus-target](http://oeptotikb.bkt.clouddn.com/20171123-ceph-prometheus.jpg)
+
+
+### 导入 grafana 模板
+
+grafana 模板可以直接在[官网](https://grafana.com/dashboards)搜索。这里的模板使用的[这个](https://github.com/SUSE/grafana-dashboards-ceph)，直接导入对应json文件，注意要将"datasource"改为自己的datasource name,不然会报错。
+
+
 ## 参考文章
 
 [kubernetes-prometheus](https://github.com/giantswarm/kubernetes-prometheus)
@@ -961,6 +1039,7 @@ spec:
 
 [基于Prometheus做多维度的容器监控](http://blog.yiyun.pro/%E5%9F%BA%E4%BA%8Eprometheus%E5%81%9A%E5%A4%9A%E7%BB%B4%E5%BA%A6%E7%9A%84%E5%AE%B9%E5%99%A8%E7%9B%91%E6%8E%A7/)
 
+[用K8S+Prometheus四步搭建Ceph监控](http://www.jianshu.com/p/0dcdbc1135bd)
 
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
