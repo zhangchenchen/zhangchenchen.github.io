@@ -9,7 +9,7 @@ tags:
 
 ## 概述
 
-kubernetes本身是不提供网络方案的，我们需要通过addon的方式为k8s集群提供网络功能。目前有很多这种第三方的解决方案，从实现原理上来说大致分为两种，一种是Overlay Networking，也就是通过封包解包的方式构造一个隧道，这种方案在IAAS层用的比较多，比如openstack-neutron就使用的ovs，这种方式因为封包解包的动作，所以性能会有所下降，调试也比较复杂（搞openstack的深有体会）。不过部署简单，架构清晰。代表性的方案有flannel，weave，calico(ipip)，openvswitch等。还有一种方案就是通过路由来实现(更改iptables等手段)，这种方式性能损耗少，不过随着集群内容器增加，路由记录也会不断增加，性能随之逐渐下降。这种方案的典型代表是calico(bgp)，Macvlan（需特殊二层路由器），contiv等。
+kubernetes本身是不提供网络方案的，我们需要通过addon的方式为k8s集群提供网络功能。目前有很多这种第三方的解决方案，从实现原理上来说大致分为两种，一种是Overlay Networking，也就是通过封包解包的方式构造一个隧道，这种方案在IAAS层用的比较多，比如openstack-neutron就使用的ovs，这种方式因为封包解包的动作，所以性能会有所下降，调试也比较复杂（搞openstack的深有体会）。不过部署简单，架构清晰。代表性的方案有flannel(udp/vxlan)，weave，calico(ipip)，openvswitch等。还有一种方案就是通过路由来实现(更改iptables等手段)，这种方式性能损耗少，不过随着集群内容器增加，路由记录也会不断增加，性能随之逐渐下降。这种方案的典型代表是flannel(host-gw)，calico(bgp)，Macvlan（需特殊二层路由器），contiv等。
 
 下面就说下几种网络方案的对比，并在下一篇博客中详细叙述下两种最常见的网络方案：flannel和calico。
 
@@ -30,7 +30,7 @@ kubernetes本身是不提供网络方案的，我们需要通过addon的方式�
 
 ![yourong-test-result-2](http://7xrnwq.com1.z0.glb.clouddn.com/20171211-test-result-you-2.jpg)
 
-再次说一下，具体的网络方案还是得看实际应用场景，是私有云环境，公有云环境，还是混合云环境，有无SDN，节点数量，集群规模等等，以上测试仅供参考。
+再次说一下，以上测试仅供参考，性能测试是一个罗生门，具体的网络方案还是得看实际应用场景，是私有云环境，公有云环境，还是混合云环境，有无SDN，节点数量，集群规模等等，最朴素的判断Underlay 网络性能确实优于 Overlay 网络，但是Overlay 较 Underlay 可以支持更多的二层网段，能更好地利用已有网络，以及有避免物理交换机 MAC 表耗尽等优势，所以在方案选型的时候需要综合考虑。
 
 
 ### 特点对比
@@ -55,6 +55,7 @@ kubernetes本身是不提供网络方案的，我们需要通过addon的方式�
 
 [Docker容器跨主机通信方案选哪一种？](https://www.zhihu.com/question/49245479)
 
+[一文搞懂各种 Docker 网络 - 每天5分钟玩转 Docker 容器技术（72）](http://www.cnblogs.com/CloudMan6/p/7587532.html)
 
 ***本篇文章由[pekingzcc](https://zhangchenchen.github.io/)采用[知识共享署名-非商业性使用 4.0 国际许可协议](https://creativecommons.org/licenses/by-nc-sa/4.0/)进行许可,转载请注明。***
 
