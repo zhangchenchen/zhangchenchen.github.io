@@ -183,11 +183,15 @@ Ingress spec 中包含配置一个loadbalancer或proxy server的所有信息。�
 
 如果需要部署 https，可以参考[Using Traefik with TLS on Kubernete](https://medium.com/@patrickeasters/using-traefik-with-tls-on-kubernetes-cb67fb43a948)
 
+最后贴一个trouble shooting 的案例[Kubernetes: troubleshooting ingress and services traffic flows](http://blog.wercker.com/troubleshooting-ingress-kubernetes)
+
 ## 参考文章
 
 [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
 [Kubernetes Ingress Controller](https://docs.traefik.io/user-guide/kubernetes/)
+
+[Kubernetes: troubleshooting ingress and services traffic flows](http://blog.wercker.com/troubleshooting-ingress-kubernetes)
 
 [Traefik-kubernetes 初试](https://mritd.me/2016/12/06/try-traefik-on-kubernetes/)
 
