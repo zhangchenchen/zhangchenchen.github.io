@@ -45,6 +45,36 @@ Cobbler 是典型的CS架构，我们只需要在服务端做好相应的安装�
 - 利用cobbler check 查看配置错误，有些地方并非必须修改。
 - server 与 next-server设置为第二块网卡的ip
 
+### Cobbler 各目录说明
+
+
+配置文件目录：/etc/cobbler
+- /etc/cobbler/settings：cobbler 主配置文件
+- /etc/cobbler/iso/：iso 模板配置文件
+- /etc/cobbler/pxe：pxe 模板文件
+- /etc/cobbler/power：电源的配置文件
+- /etc/cobbler/users.conf：Web 服务授权配置文件
+- /etc/cobbler/users.digest：用于 web 访问的用户名密码配置文件
+- /etc/cobbler/dhcp.template：DHCP 服务的配置模板
+- /etc/cobbler/dnsmasq.template：DNS 服务的配置模板
+- /etc/cobbler/tftpd.template：tftp 服务的配置模板
+- /etc/cobbler/modules.conf：Cobbler 模块配置文件
+
+数据目录：/var/lib/cobbler
+- /var/lib/cobbler/config/：用于存放 distros、systems、profiles 等信息配置文件
+- /var/lib/cobbler/triggers：用于存放用户定义的 cobbler 命令
+- /var/lib/cobbler/kickstarts/：默认存放 kickstart 文件
+- /var/lib/cobbler/loaders：存放各种引导程序
+
+镜像数据目录：/var/www/cobbler
+- /var/www/cobbler/ks_mirror/：导入的发行版系统的所有数据
+- /var/www/cobbler/images/：导入发行版的 Kernel 和 initrd 镜像用于远程网络启动（ks_mirror 下对应发行版 系统的软链）
+- /var/www/cobbler/repo_mirror/：repo 仓库存储目录
+
+日志目录：/var/log/cobbler/
+- /var/log/cobbler/install.log：客户端系统安装日志
+- /var/log/cobbler/cobbler.log：cobbler日志
+
 ### Cobbler 使用
 
 - 利用lrzsz命令上传 centos7-minimal 镜像至虚拟机guest#1.
