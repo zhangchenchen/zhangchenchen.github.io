@@ -46,8 +46,7 @@ Cloudera 的CDH应该是目前大数据平台安装部署的首选，不过CDH�
 ### seed节点操作系统安装
 
 这一部分的工作主要是seed节点操作系统的制作，大致步骤如下：
-- 安装镜像制作软件包（createrepo & mkisofs
-）
+- 安装镜像制作软件包（createrepo & mkisofs）
 - 拷贝系统镜像文件到指定目录
 - 编写Kickstart 文件
 - 生成依赖关系和ISO文件
