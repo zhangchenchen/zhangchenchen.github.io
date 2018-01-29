@@ -165,6 +165,8 @@ $ systemctl start cloudera-scm-agent
 
 进入 Cloudera Manager的console，http://Server host:7180,登录后便可以进入CDH的安装部署了。
 
+该过程没有截图，且因为web界面看着比较直白不在赘述。
+
 
 ## 参考文章
 
