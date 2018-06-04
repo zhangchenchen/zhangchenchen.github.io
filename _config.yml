@@ -60,6 +60,11 @@ time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
 
+index_generator:
+  path: ''
+  per_page: 10
+  order_by: -date
+
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
