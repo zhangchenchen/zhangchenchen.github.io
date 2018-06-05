@@ -71,6 +71,8 @@ kafka 的设计目标如下：
 
 - kafka 依赖zookeeper来实现负载均衡以及原数据的存取。
 - kafka之所以实现如此快的数据持久化，是因为磁盘io是顺序读写，在某些情况下，顺序磁盘访问能够比随即内存访问还要快（跟操作系统的预读，后写等技术有关）。
+- kafka 的consumer group 实现了consumer 的auto rebalance，之前是依赖zookeeper实现的，会出现脑裂的情况，后来专门开发了coordinator组件来实现，目前仍在不断改进。
+- kafka 的高性能有很多原因，包括消息的batch send,消息压缩（producer端和broker端都可做），ISR（in-sync replicas)机制，磁盘 append only，page cache等等。
 
 
 
