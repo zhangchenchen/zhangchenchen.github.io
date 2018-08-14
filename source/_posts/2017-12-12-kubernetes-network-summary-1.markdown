@@ -24,7 +24,7 @@ kubernetes本身是不提供网络方案的，我们需要通过addon的方式�
 ![test-result](http://7xrnwq.com1.z0.glb.clouddn.com/2017121-test-result.jpg)
 总结一下就是私有云环境下flannel + host-gw方案顶呱呱。
 
-第二篇文章是来自有容云团队的，他们覆盖的方案范围比较广，详情可参考[Kubernetes网络原理及方案](http://www.youruncloud.com/blog/131.html)，这里直接贴测试结果：
+第二篇文章是来自网友@Kelvin Peng，覆盖的方案范围比较广，详情可参考[Docker network on cloud](http://cmgs.me/life/docker-network-cloud)，这里直接贴测试结果：
 
 ![yourong-test-result-1](http://7xrnwq.com1.z0.glb.clouddn.com/20171211-test-result-you-1.jpg)
 
