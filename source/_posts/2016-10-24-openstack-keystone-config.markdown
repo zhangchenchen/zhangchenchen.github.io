@@ -36,7 +36,7 @@ tips:keystone默认端口是35357，因此我们最好将35357端口从临时端
 
 keystone.conf文件中所有的配置项如下：
 
-![keystone-config](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-keystone-config.png)
+![keystone-config](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-keystone-config.png)
 
 接下来我们从其中挑选几个值得注意的配置项详细说明下：
 
@@ -49,20 +49,20 @@ token provider 大致有以下四种形式：
 
  - UUID:长度固定为 32 Byte 的随机字符串,UUID token 简单美观,验证流程如下：
  
-![uuid](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-uuid.png)
+![uuid](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-uuid.png)
 由于每当 OpenStack API 收到用户请求，都需要向 Keystone 验证该 token 是否有效。随着集群规模的扩大，Keystone 需处理大量验证 token 的请求，在高并发下容易出现性能问题。为了杜绝keystone成为瓶颈，引出了下面的几种。
 
  - PKI:验证流程如下：
-![pki](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-pki.png)
+![pki](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-pki.png)
 可以看出，PKI token携带更多用户信息的同时还附上了数字签名，以支持本地认证，从而避免了步骤 4。因为 PKI token 携带了更多的信息，这些信息就包括 service catalog，随着 OpenStack 的 Region 数增多，service catalog 携带的 endpoint 数量越多，PKI token 也相应增大，很容易超出 HTTP Server 允许的最大 HTTP Header(默认为 8 KB)，导致 HTTP 请求失败。
  - PKIZ:顾名思义，就是对PKI token进行压缩，但压缩效果有限，无法良好的处理 token size 过大问题。原理同上，无须赘述。
  - FERNET:前三种 token 都会持久性存于数据库，与日俱增积累的大量 token 引起数据库性能下降，所以用户需经常清理数据库的 token（ 命令为：keystone-manage token_flush）。为了避免该问题，社区提出了 Fernet token，它携带了少量的用户信息，大小约为 255 Byte，采用了对称加密，无需存于数据库中。
 
-![fernet](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-fernet.png)
+![fernet](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-fernet.png)
 
  - 几种token provider比较如下：
  
-![token比较](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-token%20compare.png)
+![token比较](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-token%20compare.png)
 
 2. Caching Layer
 
@@ -97,7 +97,7 @@ keystone 提供了两种配置选项。
   ```
 
   模板文件示例：
-  ![template](http://7xrnwq.com1.z0.glb.clouddn.com/20161024-template.png)
+  ![template](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161024-template.png)
 
 
 4. 其他

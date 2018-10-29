@@ -131,7 +131,7 @@ if __name__=='__main__':
 这个例子看明白了，yield与send的用法就理解的差不多了。
 我们首先看一下执行结果：
 
-![python-yield](http://7xrnwq.com1.z0.glb.clouddn.com/20160926python-yield.png)
+![python-yield](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160926python-yield.png)
 
 接下来分析一下：我们从main 函数开始，先创建了一个生成器（此时并未执行），接着输出main函数开始的语句。接着进入for循环，注意，遇到for循环就相当于执行了一次next(),所以进入生成器输出“Into genaration :counting down from 5”，继续运行，进入生成器的for循环，输出“Genaration: ###loops from here###”，继续往下，碰到yield n ，保存上下文，退出并返回n(此时是5)到main函数，主函数输出“Main function: x is 5”，进入条件语句，c.send(5)触发生成器，再次进入生成器，赋值newvalue为3，接着输出“Gerenation: newvalue is 3” ，赋值n = newvalue =3 ,继续循环输出“Genaration: ###loops from here###”，碰到yield n ,返回main函数，注意，此时main函数又进入到for循环，所以再次进入生成器，但是没有send()数据传过来，也可以理解为send(none),所以输出“Gerenation: newvalue is none”,接着执行n-1 ,n变为2。继续循环，输出“Genaration: ###loops from here###”。。。。。
 

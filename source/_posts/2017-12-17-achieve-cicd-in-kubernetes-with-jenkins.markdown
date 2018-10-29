@@ -143,20 +143,20 @@ spec:
 
 新建一个item，命名并选中pipeline:
 
-![new-item](http://7xrnwq.com1.z0.glb.clouddn.com/20171218184207-new-item.jpg)
+![new-item](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218184207-new-item.jpg)
 
 pipeline 配置如下：
 
-![pipeline](http://7xrnwq.com1.z0.glb.clouddn.com/2017121818480-pipeline.jpg)
+![pipeline](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017121818480-pipeline.jpg)
 
 在Git Repository URL部分添加github url,这里用的是[我的github-test-kubernetes-ci-cd](https://github.com/zhangchenchen/kubernetes-ci-cd)，是直接fork自[kubernetes-ci-cd](https://github.com/kenzanlabs/kubernetes-ci-cd)，并做了一些更改,之后保存就可以了。
 进入刚创建的item，点击立即构建：
 
-![build](http://7xrnwq.com1.z0.glb.clouddn.com/20171218185344-build.jpg)
+![build](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218185344-build.jpg)
 
 之后就可以看到构建信息了，如果出错也可以查看对应步骤的log。
 同时，我们的应用也已经部署到k8s中了。
-![test-jenkins](http://7xrnwq.com1.z0.glb.clouddn.com/20171218190117-test-jenkins.jpg)
+![test-jenkins](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218190117-test-jenkins.jpg)
 
 ### 步骤详解
 
@@ -258,16 +258,16 @@ spec:
 安装比较简单，直接到jenkins 界面的系统管理，插件管理界面进行安装就可以了。
 安装好之后，进入系统管理----->系统设置，最下面有一个“云”，选择“新增一个云”---->kubernetes。
 
-![jenkins-k8s](http://7xrnwq.com1.z0.glb.clouddn.com/20171218194329-jenkins-k8s.jpg)
+![jenkins-k8s](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218194329-jenkins-k8s.jpg)
 这里没有配置k8s，因为如果不配置api-server的话，jenkins会默认使用~/.kube/config下的配置，而我们已经在~/.kube/config做过配置了，所以这里就不做了。Jenkins URL我们使用的是集群内的服务地址。
 再往下看 kubernetes pod template配置：
 
-![jenkins-pod-template](http://7xrnwq.com1.z0.glb.clouddn.com/20171218195151jenkins-pod-template.jpg)
+![jenkins-pod-template](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218195151jenkins-pod-template.jpg)
 
 这个pod tempalte就是之后我们创建 agent使用的模板，镜像使用“jenkins/jnlp-slave:alpine”，配置完成后，点击保存。
 然后还要配置一下agent与jenkins通信的端口，在系统管理---->Configure Global Security，指定端口为我们之前设定的5000端口：
 
-![jenkins-port](http://7xrnwq.com1.z0.glb.clouddn.com/20171218195724-jenkins-port.jpg)
+![jenkins-port](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218195724-jenkins-port.jpg)
 
 ### 简单测试
 
@@ -275,24 +275,24 @@ spec:
 
 新建一个item，这里选择“构建一个自由风格的软件项目”：
 
-![test-jnlp](http://7xrnwq.com1.z0.glb.clouddn.com/20171218200215test-jnlp.jpg)
+![test-jnlp](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218200215test-jnlp.jpg)
 
 配置时注意在General部分有一个restrict：
 
-![jenkins-general](http://7xrnwq.com1.z0.glb.clouddn.com/20171218200511-general.jpg)
+![jenkins-general](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218200511-general.jpg)
 Label Expression就写之前我们k8s podtemplate 的label。
 
 在构建部分我们写一个简单的测试命令：echo TRUE
 
-![jenkins-build](http://7xrnwq.com1.z0.glb.clouddn.com/20171218200831-jenkins-build.jpg)
+![jenkins-build](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218200831-jenkins-build.jpg)
 
 点击立即构建，如果成功的话，我们在“管理主机”模块会看到新增了一个主机：
 
-![add-host](http://7xrnwq.com1.z0.glb.clouddn.com/20171218162939-multi-host.jpg)
+![add-host](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218162939-multi-host.jpg)
 同时，也会在k8s中发现新创建了一个名为jnlp-slave-8bq5m的pod。
 任务结束后，pod删除，主机消失，在console output 会看到执行结果：
 
-![console-optput](http://7xrnwq.com1.z0.glb.clouddn.com/20171218201618-console-output.jpg)
+![console-optput](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171218201618-console-output.jpg)
 
 
 ## 出现问题总结

@@ -37,17 +37,17 @@ tags: openstack
 
 首先放一张 Openstack 的整体概念结构图：
 
-![Conceptual Architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160822openstack-concept-architeucture.jpg)
+![Conceptual Architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160822openstack-concept-architeucture.jpg)
 
 第二张图是逻辑结构图(图是13年的，现在的Network Service已经变更为Neutron)
 
-![openstack architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160822openstack-architecture.jpg)
+![openstack architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160822openstack-architecture.jpg)
 
 图中可以看出，Nova处于Openstack的一个核心位置，其他组件都为 Nova 提供支持，Glance 为 VM 提供 image ，Cinder 和 Swift 分别为 VM 提供块存储和对象存储，Neutron 为 VM 提供网络连接。
 
 接下来一张就是Nova的架构图：
 
-![nova architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160822-nova-architecture.png)
+![nova architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160822-nova-architecture.png)
 
 这些组件以子服务（后台 deamon 进程）的形式运行。总的来说，nova的各个组件是以数据库和队列为中心进行通信的，下面对其中的几个组件做一个简单的介绍：
 
@@ -72,7 +72,7 @@ tags: openstack
 
 ## VM实例的生命周期管理
 
-![VM实例的生命周期](http://7xrnwq.com1.z0.glb.clouddn.com/20160822-openstack-instance-lifetime.png)
+![VM实例的生命周期](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160822-openstack-instance-lifetime.png)
 
 有的操作功能比较类似，也有各自的适用场景，简单介绍下上述几个重要的操作：
 
@@ -139,7 +139,7 @@ Live Migrate 分两种：
 
 接下来以非共享存储Block Migration 为例简述下Nova的工作流程：
 
-![block migration](http://7xrnwq.com1.z0.glb.clouddn.com/20160823nova-process.jpg)
+![block migration](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160823nova-process.jpg)
 
 1. 向 nova-api 发送请求：通过dashboard 发送live migrate消息，指定源节点，目标节点。
 

@@ -318,7 +318,7 @@ def get_filtered_hosts(self, hosts, spec_obj, index=0):
 
  - novascheduler 源码目录架构：
 
- ![novascheduler code](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-08-openstack-nova-scheduler-code.png)
+ ![novascheduler code](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-08-openstack-nova-scheduler-code.png)
 
  - nova scheduler实现了三种调度器：ChanceScheduler(随机调度器)，FilterScheduler(过滤调度器)，CachingScheduler(缓存调度器，在FilterScheduler的基础上将主机资源缓存在本地，通过后台定时任务从数据库更新缓存信息)。如果我们想自己实现定制的调度器，需要实现的接口在nova.scheduler.driver.Scheduler,继承类SchedulerDriver.
 

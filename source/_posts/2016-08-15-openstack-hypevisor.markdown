@@ -26,7 +26,7 @@ kvm能在不改变linux或windows镜像的情况下同时运行多个虚拟机�
 在主流的linux内核，如2.6.20以上的内核均包含了kvm核心。
 
 图片来自wikipedia
-![kvm image](http://7xrnwq.com1.z0.glb.clouddn.com/20160815-kvm-image.png)
+![kvm image](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160815-kvm-image.png)
 
 #### 名词解释：KVM QEMU qemu-kvm Libvirt
 
@@ -37,7 +37,7 @@ kvm能在不改变linux或windows镜像的情况下同时运行多个虚拟机�
 [qemu-kvm](http://wiki.qemu.org/KVM):kvm负责cpu虚拟化+内存虚拟化，实现了cpu和内存的虚拟化，但kvm不能模拟其他设备。qemu模拟IO设备（网卡，磁盘等），kvm加上qemu之后就能实现真正意义上服务器虚拟化。因为用到了上面两个东西，所以称之为qemu-kvm。
 
 [Libvirt](https://libvirt.org/index.html):目前使用最为广泛的一种对虚拟机进行管理的工具和API。Libvirtd是一个daemon进程，可以被本地的virsh调用，也可以被远程的virsh调用，Libvirtd调用qemu-kvm操作虚拟机。
-![Libvirt arcitecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160815-Libvirt.jpg)
+![Libvirt arcitecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160815-Libvirt.jpg)
 
 [更多Libvirt介绍](https://segmentfault.com/a/1190000004356172)
 

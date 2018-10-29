@@ -34,7 +34,7 @@ tags: openstack
   v1版本逐渐弃用，目前v2版本用的比较多，v3版本正在开发中。v1与v2版的区别还是比较大的，不只是添加了很多API。v1版本中glance-api与glance-registry都是一个WSGI server,glance-api负责接收用户的restful请求，如果该请求是与metedata相关的，则将其转发给glance-registry，glance-registry会解析请求并与数据库交互，如果该请求是与image自身存取相关的，则直接转发给store backend。V2版本中，glance-registry服务的内容被整合进了glance-api中，采用责任链的模式实现API的处理流程。在下面结合实例分析的时候会更清晰。
   以下示例图来自网上，正确性不保证：
 
- ![glance-api-version](http://7xrnwq.com1.z0.glb.clouddn.com/20161214-glance-api-version.png)
+ ![glance-api-version](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161214-glance-api-version.png)
 
  关于API 的详细介绍在这个页面[check this](http://developer.openstack.org/api-ref/image/v2/index.html)
 
@@ -44,7 +44,7 @@ tags: openstack
 ## glance 整体代码解读
 
 
-![glance code](http://7xrnwq.com1.z0.glb.clouddn.com/20161214-glance-code.png)
+![glance code](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161214-glance-code.png)
 
 - 看下setup.cfg中的启动脚本内容：
 
@@ -91,7 +91,7 @@ console_scripts =
         
      3. image的status变更：
 
-    ![image-status](http://7xrnwq.com1.z0.glb.clouddn.com/574303-20160130210517989-1038953385.png)
+    ![image-status](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/574303-20160130210517989-1038953385.png)
 
 - glance 中的task概念：在V2版本的API中提出了task的概念，关于为什么提出task的概念以可看这篇博客[Getting started with Tasks API in Glance](https://geetikabatra.wordpress.com/2015/06/15/getting-started-with-tasks-api-in-glance/)。
  

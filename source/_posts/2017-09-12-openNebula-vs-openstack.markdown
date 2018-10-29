@@ -11,7 +11,7 @@ tags:
 
 本篇博文说实话感觉滞后太多，因为关于云计算开源框架的争论在前几年还甚嚣尘上，自从openstack风卷残云之势席卷整个云计算圈之后，之前的一些老前辈貌似都默默退出了，这也包括本文的一个主角OpenNebula。其实OpenNebula一直都在，只不过OpenStack的名气太大，以至于其他框架都被无意间忽略了。不过随着OpenStack项目的飞速膨胀，复杂度与可维护性也随之疯涨，OpenNebula这个一直秉承“Simplicity,Flexibility”的框架也得到了不少人的拥趸，本文就主要讲讲这个本应在几年前讨论的话题：OpenStack 与OpenNebula，孰优孰劣。
 
-![openstack vs opennebula](http://7xrnwq.com1.z0.glb.clouddn.com/2017-09-12-opennebula-vs-openstack.jpg)
+![openstack vs opennebula](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-09-12-opennebula-vs-openstack.jpg)
 
 ## OpenStack VS OpenNebula
 
@@ -24,21 +24,21 @@ Openstack从一开始就是打算跟AWS正面刚，所以一直借鉴（抄袭�
 
 这个区别对于技术人员来说就更感兴趣了。因为刚开始的定位不同，自然架构也是天壤之别，先上两张图直观感受下：
 
-![openstack-arch](http://7xrnwq.com1.z0.glb.clouddn.com/20170912openstack-arch.jpg)
+![openstack-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170912openstack-arch.jpg)
 
-![opennebula](http://7xrnwq.com1.z0.glb.clouddn.com/20170912-opennebula-arch.jpg)
+![opennebula](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170912-opennebula-arch.jpg)
 
 一张图就可以大致了解到，如今的OpenStack俨然是一个庞然大物，不过好在各个子项目分工明确，划分成层之后如下图（图比较老了，有些项目已经毕业了）：
 
-![openstack-arch](http://7xrnwq.com1.z0.glb.clouddn.com/20170913-openstack-layer.jpg)
+![openstack-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170913-openstack-layer.jpg)
 
 再看下具体部署情况：
 
 openstack的典型部署架构：
-![openstack-deploy](http://7xrnwq.com1.z0.glb.clouddn.com/20170913085313-openstack-deploy.jpg)
+![openstack-deploy](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170913085313-openstack-deploy.jpg)
 
 opennebula的典型部署架构：
-![opennebula-deploy](http://7xrnwq.com1.z0.glb.clouddn.com/20170913085402-open-nebula-deploy.jpg)
+![opennebula-deploy](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170913085402-open-nebula-deploy.jpg)
 
 可以看出，在计算节点openstack要部署很多agent(包括nova-compute)，而opennebula只要保证可以SSH连接以及有hypervisor就可以，是一种无侵入式的设计。
 
@@ -47,7 +47,7 @@ opennebula的典型部署架构：
 
 网上一张截图（时效性不保证）：
 
-![opennebula-vs-openstack](http://7xrnwq.com1.z0.glb.clouddn.com/20170913090037-feature.jpg)
+![opennebula-vs-openstack](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170913090037-feature.jpg)
 
 
 

@@ -26,7 +26,7 @@ tags: think
 ### 技术认知的三个层次
 
 为了之后描述方便，首先给出技术认知的三个大致层次：
-![三个层次](http://7xrnwq.com1.z0.glb.clouddn.com/20160802-three-level.jpg)
+![三个层次](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160802-three-level.jpg)
 简洁明了。
 再简单介绍下我所理解的这三个层次：
 

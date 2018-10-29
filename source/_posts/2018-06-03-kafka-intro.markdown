@@ -38,7 +38,7 @@ kafka 的设计目标如下：
 - 事件驱动架构的核心组件。 
 
 
-![kafka-api](http://7xrnwq.com1.z0.glb.clouddn.com/2018-06-04kafka-api.png)
+![kafka-api](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-06-04kafka-api.png)
 
 上图中可看出kafka的角色，相应的，kafka也提供了四种核心api:
 - The Producer API allows an application to publish a stream of records to one or more Kafka topics.
@@ -51,7 +51,7 @@ kafka 的设计目标如下：
 
 了解kafka，需要了解kafka  的一些术语,包括 producer,consumer,topic ,partition,broker等等。下面结合架构图统一解释：
 
-![kafka-inf](http://7xrnwq.com1.z0.glb.clouddn.com/2018-06-04-kafka-infra.png)
+![kafka-inf](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-06-04-kafka-infra.png)
 
 - 首先kafka 有producer 和consumer的概念，一个生产数据，一个消费数据，中间是一个broker（也就是一个消息队列），producer是以push的方式向broker推数据，consumer以pull 的方式从broker消费数据。
 - producer 与consumer是通过topic 关联在一块的。topic类似于一个特定的分类。producer向某个指定的topic push数据，consumer从指定的topic消费数据。

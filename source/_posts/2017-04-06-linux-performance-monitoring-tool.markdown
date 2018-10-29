@@ -22,7 +22,7 @@ tags:
 
 这应该是第一个想到的性能监控命令，示例截图如下：
 
-![top](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-top.png)
+![top](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-top.png)
 
 我们关注得点应该包括：cpu,mem负载，load-average，以及占用内存或cpu最多的进程。
 该命令还有一些交互的子命令，比如 "c" ,是按照CPU 占用排序，"m"是按照内存占用排序等。 
@@ -32,7 +32,7 @@ tags:
 该命令号称系统监控的瑞士军刀，目前Linux上最为全面的系统性能分析工具之一，可以从14个大方面对系统的活动进行报告，包括文件的读写情况、系统调用的使用情况、串口、CPU效率、内存使用状况、进程活动及IPC有关的活动等，使用也是较为复杂。
 sar 默认显示的是从零点开始每隔十分钟到现在的CPU情况，如果是查看之前的报告，需要指定日志报告，sar -f /var/log/sysstat/sa25 。
 
-![sar-u](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-sar.png)
+![sar-u](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-sar.png)
 
 解释下各列的指标：
 - %user 用户模式下消耗的CPU时间的比例；
@@ -44,15 +44,15 @@ sar 默认显示的是从零点开始每隔十分钟到现在的CPU情况，如�
 
 查看 内存使用情况：sar -r 
 
-![sar-r](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-dar-r.png)
+![sar-r](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-dar-r.png)
 
 查看内存页面交换发生状况：sar -W
 
-![sar-w](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-sar-w.png)
+![sar-w](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-sar-w.png)
 
 查看带宽信息：sar -n DEV
 
-![sar-n](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-SARN.png)
+![sar-n](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-SARN.png)
 
 
 
@@ -70,7 +70,7 @@ sar 默认显示的是从零点开始每隔十分钟到现在的CPU情况，如�
 
 该命令会显示各种与网络相关的信息，比如网络连接，路由表，接口状态等。
 
-![netstst](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-netstat.png)
+![netstst](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-netstat.png)
 
 解释下主要有两个部分：
 
@@ -95,7 +95,7 @@ sar 默认显示的是从零点开始每隔十分钟到现在的CPU情况，如�
 
 以下为一个查看网卡统计信息的界面：
 
-![iptraf](http://7xrnwq.com1.z0.glb.clouddn.com/2017-04-06-iptraf.png)
+![iptraf](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-06-iptraf.png)
 
 
 

@@ -15,7 +15,7 @@ k8s的HA相对于[openstack的HA](https://zhangchenchen.github.io/2017/04/14/ope
 - apiserver(无状态服务)的HA:双活模式，前面加一个load balance
 - controller manager 和 scheduler的HA:主备模式。
 
-![k8s-ha](http://7xrnwq.com1.z0.glb.clouddn.com/20170822-k8s-ha.jpg)
+![k8s-ha](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20170822-k8s-ha.jpg)
 
 博主是按照[Kubernetes 1.6 高可用集群部署](http://blog.frognew.com/2017/04/install-ha-kubernetes-1.6-cluster.html#42-kubelet部署)这篇博客一步步安装下来的，基于Kubernetes二进制包手动部署一个高可用的Kubernetes 1.6集群，将启用ApiServer的TLS双向认证和RBAC授权等安全机制，当然，也可以利用kubeadm创建一个k8s cluster后再扩展成高可用的，参考[一步步打造基于Kubeadm的高可用Kubernetes集群](http://tonybai.com/2017/05/15/setup-a-ha-kubernetes-cluster-based-on-kubeadm-part1/)。
 安装过程不再赘述，参考上述博文，主要讲下期间遇到的问题以及解决方法。

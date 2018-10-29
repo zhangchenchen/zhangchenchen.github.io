@@ -48,7 +48,7 @@ $ cinder backup-create  --name incrementalbackup --incremental <volume-ID>
 
 可以利用删除backup 来证明一下，增量备份都会有一个 parent backup（父备份），就是基于父备份来做增量备份，通常来说，就是我们刚开始做的那个全量备份。在删除父备份之前，必须先把所有它的子备份删除，才可以成功删除父备份。示例如下：
 
-![cinder-backup](http://7xrnwq.com1.z0.glb.clouddn.com/2017-05-09-cinder-backup.png)
+![cinder-backup](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-05-09-cinder-backup.png)
 
 
 

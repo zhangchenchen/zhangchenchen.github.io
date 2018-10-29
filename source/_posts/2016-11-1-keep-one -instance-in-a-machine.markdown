@@ -87,7 +87,7 @@ except IOError:
 ```
 
 效果如下：
-![demo](http://7xrnwq.com1.z0.glb.clouddn.com/2016-11-01fcntl.png)
+![demo](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-11-01fcntl.png)
  
 使用这种方式有个地方要注意：你不知道什么时候别人可能把你作为flag的文件给删除了。当然可以通过逻辑判断的方式来解决，但当程序比较复杂的时候可能还会出现意料外的问题。所以我们可以用端口独占的方式来避免这种情况。
 

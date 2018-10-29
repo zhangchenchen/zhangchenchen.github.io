@@ -33,7 +33,7 @@ kombo 更像是celery 的定制库，在celery中大量使用了kombu中的概�
 首先了解一个blueprint 的概念，跟flask里面的概念类似，都是一个分组的概念。celery worker 启动的时候会有两个blueprint，一个是worker，一个是consumer，这两个blueprint都包含一些bootstep,bootstep 可以认为是启动的组件,bootstep 之间是有依赖关系的，也就是说，他们的启动是有顺序的，这些bootstep 很多引用了kombu中的概念。 
 
 如下是worker 的bootstep:
-![celery-blueprint](http://7xrnwq.com1.z0.glb.clouddn.com/celery-blueprint.png)
+![celery-blueprint](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/celery-blueprint.png)
 简要介绍下各个bootstep 的作用：
 
 Worker bootstep：
@@ -56,7 +56,7 @@ Consumer bootstep：
 - Control：远程命令管理服务
 
 各个bootstep 的依赖关系：
-![bootstep](http://7xrnwq.com1.z0.glb.clouddn.com/2018-07-03-bootstep.png)
+![bootstep](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-07-03-bootstep.png)
 
 这些bootstep 的具体行为这里不做解释了，感兴趣的可以去看参考文章，celery这里还留了一个接口，可以让我们自己 custom bootstep，自定义一个bootstep 类，然后hook 一些worker 在不同阶段会执行的自定义动作。参考[Extensions and Bootsteps](http://docs.celeryproject.org/en/latest/userguide/extending.html#blueprints)
 

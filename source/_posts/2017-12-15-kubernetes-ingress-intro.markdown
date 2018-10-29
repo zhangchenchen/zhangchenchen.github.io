@@ -25,13 +25,13 @@ k8s集群暴露内部服务有多种方式：
 
 贴一张图，图片来自[这里](https://mritd.me/2016/12/06/try-traefik-on-kubernetes/#13ingress)
 
-![ingress-arch](http://7xrnwq.com1.z0.glb.clouddn.com/20171214-ingress-arch.jpg)
+![ingress-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171214-ingress-arch.jpg)
 
 ## Ingress 实践
 
 ingress包括反向代理负载均衡器，Ingress Controller，ingress三部分，通常反向代理负载均衡器与Ingress Controller会部署到同一个pod中，一个负责反向代理，一个负责与k8s交互并更新配置。不过随着微服务的流行，有人将这两个功能合在了一块，就是traefik。这样，大致结构就是这样：
 
-![traffic](http://7xrnwq.com1.z0.glb.clouddn.com/20171214traffic.jpg)
+![traffic](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171214traffic.jpg)
 
 接下来开始部署：
 
@@ -177,7 +177,7 @@ Ingress spec 中包含配置一个loadbalancer或proxy server的所有信息。�
 
 部署完成，修改本地host，将traefik-ui.minikube 指向host ip。浏览器中输入http://traefik-ui.minikube/dashboard/#/即可：
 
-![traffic-web-ui](http://7xrnwq.com1.z0.glb.clouddn.com/20171214-traffic-web-ui.jpg)
+![traffic-web-ui](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171214-traffic-web-ui.jpg)
 
 生产环境中可以利用dns再做一层负载均衡。
 

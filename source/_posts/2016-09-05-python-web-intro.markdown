@@ -131,13 +131,13 @@ httpd.serve_forever()
 翻看python 的wiki，我们发现关于python的web framework 以井喷的速度发展，各式各样的框架。截两张图，分别是主流的全栈框架和非全栈框架：
 
 主流的全栈python web框架:
-![full-stack](http://7xrnwq.com1.z0.glb.clouddn.com/20160905python-full-stack.jpg)
+![full-stack](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160905python-full-stack.jpg)
 
 这里要多说一句tornado框架，其实它不单是一个web框架，还是一个web服务器。作为Web框架，是一个轻量级的Web框架，类似于另一个Python web 框架Web.py，其拥有异步非阻塞IO的处理方式。作为Web服务器，Tornado有较为出色的抗负载能力，官方用nginx反向代理的方式部署Tornado和其它Python web应用框架进行对比，结果最大浏览量超过第二名近40%。见下表：
-![tornado 比较](http://7xrnwq.com1.z0.glb.clouddn.com/20160905tornado%20awesome.jpg)
+![tornado 比较](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160905tornado%20awesome.jpg)
 
 主流的非全栈python web框架：
-![non-full-stack](http://7xrnwq.com1.z0.glb.clouddn.com/2016-0905python-non-full-stack.jpg)
+![non-full-stack](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-0905python-non-full-stack.jpg)
 
 
 <a name="C"></a>
@@ -153,14 +153,14 @@ httpd.serve_forever()
  - Tornado,上文已介绍。
 
 附录一张图：
-![test](http://7xrnwq.com1.z0.glb.clouddn.com/20160905-test-cgi-glue.png)
+![test](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160905-test-cgi-glue.png)
 
 
 <a name="D"></a>
 
 ## 常见 python web生产部署环境
 
-![python web deploy](http://7xrnwq.com1.z0.glb.clouddn.com/20160905python-web-deploy.jpg)
+![python web deploy](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160905python-web-deploy.jpg)
 
 
 

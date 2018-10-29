@@ -21,26 +21,26 @@ tags:
 
 先看下Hadoop里的服务角色：
 
-![hadoop-server-role](http://7xrnwq.com1.z0.glb.clouddn.com/20180201160125-hadoop-role.jpg)
+![hadoop-server-role](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180201160125-hadoop-role.jpg)
 
 Hadoop主要的任务部署分为3个部分，分别是：Client机器，主节点和从节点。主节点主要负责Hadoop两个关键功能模块HDFS、Map Reduce的监督。Job Tracker使用Map Reduce进行监控和调度数据的并行处理，namenode则负责HDFS监视和调度。从节点负责了机器运行的绝大部分，担当所有数据储存和指令计算的苦差。每个从节点既扮演着数据节点的角色又充当与他们主节点通信的守护进程。守护进程隶属于Job Tracker，数据节点则归属于名称节点。Client负责把数据加载到集群中，递交给Map Reduce做数据处理工作，并在工作结束后取回或者查看结果。
 
 再看下典型的围绕hadoop 的workflow：
 
-![hadoop-workflow](http://7xrnwq.com1.z0.glb.clouddn.com/20180201160825hadoop-workflow.jpg)
+![hadoop-workflow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180201160825hadoop-workflow.jpg)
 
 ## HDFS Architecture
 
 ### 架构
 HDFS的整体设计架构就是master/slave，namenode负责元数据的存取，数据管理等功能，datanode负责数据存储。如下：
 
-![hdfs-arch](http://7xrnwq.com1.z0.glb.clouddn.com/20180201154432-hdfs-arch.jpg)
+![hdfs-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180201154432-hdfs-arch.jpg)
 ### datanode工作原理
 
 数据的存储方式与ceph类似，默认都是三副本，先将大数据文件切割成固定大小（比如128M）的block，然后将这些block存放到三个不同的datanode中，namenode会记录对应文件block以及block所在位置。
 举例一个datanode存储过程:client先做文件切割，并提交存储文件命令给namenode，namenode有一个rack awareness的功能，简单点说就是会将数据存储到不同机架上以避免机架故障（电源故障等），如果是三副本的话，首先client会写入block到某一节点A，然后另一机架中的节点B 会从A复制该数据,再然后同一机架内的另一个节点C会从B复制一份数据。这样一个pipeline既保证了数据的容灾，也能减小数据传输的延迟。
 
-![datanode](http://7xrnwq.com1.z0.glb.clouddn.com/20180201161950-data-node.jpg)
+![datanode](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180201161950-data-node.jpg)
 
 ### namenode工作原理
 
@@ -52,7 +52,7 @@ HDFS的整体设计架构就是master/slave，namenode负责元数据的存取�
 
 首先看一下namenode启动时做了哪些操作（下文部分直接引用自[该博客](http://blog.csdn.net/mmd0308/article/details/74674524)）：
 
-![namenode](http://7xrnwq.com1.z0.glb.clouddn.com/20180201163924-namenode.jpg)
+![namenode](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180201163924-namenode.jpg)
 
 接下来看看check point的时候做了哪些操作,这个时候就要引入Secondary NameNode了，NameNode主要是存储文件的metadata，运行时所有数据都保存在内存中，这个的HDFS可存储的文件受限于NameNode的内存。而Secondary NameNode可以看做是NameNode的灾备（并非HA），它会定时与NameNode进行同步，定期的将fsimage映像文件和Edits日志文件进行合并，并将合并后的传入给NameNode，替换其镜像，并清空编辑日志。如果NameNode失效，需要手动的将其设置成namenode主机。
 checkpoint的时间默认是3600秒（可配置），当Edits日志文件超过最大值时也会进行check point。checkpoint大致如下：

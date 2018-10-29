@@ -27,7 +27,7 @@ tags: openstack
 
 openstack中创建虚拟机的时候是附带一块硬盘的，但这块硬盘随着虚拟机的destroy也相应的删除了。所以，openstack推出了两种应付持久存储的解决方案，一个是之前我们提过的对象存储swift，一个就是现在我们讲的块存储cinder。
 块存储,对象存储的概念我们[之前](http://zhangchenchen.github.io/2016/09/02/openstack-swift/)已介绍过，不再赘述。
-![存储对比](http://7xrnwq.com1.z0.glb.clouddn.com/20160907openstack-storage-compare.jpg)
+![存储对比](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907openstack-storage-compare.jpg)
 需要说明的是，cinder并不是新开发的一个块设备存储系统，它更像是一个资源管理系统，对不同的存储后端进行封装，以统一的API形式向虚拟机提供持久块存储资源。对于不同的存储后端，它采用插件的形式，结合不同的后端存储的驱动提供块存储服务。
 
 <a name="B"></a>
@@ -35,7 +35,7 @@ openstack中创建虚拟机的时候是附带一块硬盘的，但这块硬盘�
 ## cinder如何实现
 
 首先看一下cinder的主要组件：
-![cinder architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160907-openstack-cinder-part.jpg)
+![cinder architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907-openstack-cinder-part.jpg)
 简单介绍下这几个组件：
  
  - cinder-api: 负责接受和处理外界的API请求，并将请求放入RabbitMQ队列，交由其他程序执行。
@@ -47,11 +47,11 @@ openstack中创建虚拟机的时候是附带一块硬盘的，但这块硬盘�
 接下来介绍下这种插件机制以及后端的具体存储：
 后端存储大致可以分为两类，一类是软件实现的存储系统，比如LVM,ceph,sheepdog等。另一类是商用的硬件支持的专业存储系统，比如IBM,HP,EMC等公司的专业存储系统。
 
-![不同存储](http://7xrnwq.com1.z0.glb.clouddn.com/20160907openstack-cinder-storage.jpg)
+![不同存储](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907openstack-cinder-storage.jpg)
 
 以LVM 为例：
 
-![lvm](http://7xrnwq.com1.z0.glb.clouddn.com/20160907-cinder-lvm.jpg)
+![lvm](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907-cinder-lvm.jpg)
 
 此处简单介绍下iSCSI协议,引自 [wiki](https://zh.wikipedia.org/wiki/ISCSI):
 
@@ -61,7 +61,7 @@ openstack中创建虚拟机的时候是附带一块硬盘的，但这块硬盘�
 
 其他商用存储系统：
 
-![others](http://7xrnwq.com1.z0.glb.clouddn.com/20160907-cinder-other%20-storage.jpg)
+![others](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907-cinder-other%20-storage.jpg)
 
 两者对比，[check this!](chrome-extension://ikhdkkncnoglghljlkmcimlnlhkeamad/pdf-viewer/web/viewer.html?file=https%3A%2F%2Fevents.linuxfoundation.org%2Fsites%2Fevents%2Ffiles%2Fslides%2FCloudOpenJapan2014-Kimura_0.pdf)
 
@@ -70,7 +70,7 @@ openstack中创建虚拟机的时候是附带一块硬盘的，但这块硬盘�
 
 ## cinder的具体功能
 
-![cinder functure](http://7xrnwq.com1.z0.glb.clouddn.com/20160907-cinder-functure.jpg)
+![cinder functure](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160907-cinder-functure.jpg)
 
 从代码层面了解具体实现的流程，[check this!](https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f/entry/Create_Volume_%E6%93%8D%E4%BD%9C_Part_III_%E6%AF%8F%E5%A4%A95%E5%88%86%E9%92%9F%E7%8E%A9%E8%BD%AC_OpenStack_52?lang=en)
 

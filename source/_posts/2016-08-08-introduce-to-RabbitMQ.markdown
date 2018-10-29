@@ -45,7 +45,7 @@ connection.close() # 关闭连接，关闭前会确定queue中是否还有消息
 
 Exchanges 解释：
 你可以把exchange看作是producer与queue之间的一个分发器，它会按照指定的策略把消息分发到指定queue中。
-![rabbitmq-exchange](http://7xrnwq.com1.z0.glb.clouddn.com/rabbitmq_exchange.jpg)
+![rabbitmq-exchange](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/rabbitmq_exchange.jpg)
 
 exchange 的类型有四种，
 

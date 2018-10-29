@@ -21,7 +21,7 @@ tags: openstack
 ### linux bridge 实现local 型网络
 
 对于每个local network，ML2 linux-bridge agent 会创建一个bridge,instance的tap设备连接到该bridge。位于同一local network的instance会连接同一个bridge，这样instance之间就可以通信了。但因为bridge没有与宿主机物理网卡相连，所以跟宿主机无法通信，也没法与宿主机之外的其他机器通信。下图为示例：
-![local-by-linux-bridge](http://7xrnwq.com1.z0.glb.clouddn.com/local-by-linux-bridge.jpg)
+![local-by-linux-bridge](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/local-by-linux-bridge.jpg)
 
 - 图中创建了两个local network,对应两个网桥。
 - VM0 与 VM1 在同一个 local network中，它们之间可以通信.
@@ -54,7 +54,7 @@ flat型网络是在local 型网络的基础上实现不同宿主机的instance�
 
 每一个flat network对应一个物理网卡，该对应关系需要在ml2_conf.ini配置文件中指明。下图为flat network示例：
 
-![linux-bridge-flat-net](http://7xrnwq.com1.z0.glb.clouddn.com/linux-bridge-flat-network.png)
+![linux-bridge-flat-net](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/linux-bridge-flat-network.png)
 
 - 该 flat network 在计算和控制节点都使用eth1作为接口。如果是新建另一个flat network,只能使用除eth1之外的其他物理接口，且在配置文件中添加相应的mapping配置。
 - 同一网络，不同宿主机上的Linux bridge 名称是一样的。
@@ -80,7 +80,7 @@ flat型网络是在local 型网络的基础上实现不同宿主机的instance�
 vlan network是在flat network的基础上实现多个不同的vlan network 共用同一个物理接口。需要在配置文件中指定vlan的范围（租户的网络id 范围），以及 vlan network 与物理网卡的对应关系。
 vlan network如下示例：
 
-![vlan-linux-bridge](http://7xrnwq.com1.z0.glb.clouddn.com/vlan-linux-bridge.png)
+![vlan-linux-bridge](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/vlan-linux-bridge.png)
 
 - 可以看出，bridge上除了挂载instance的tap,dhcp的tap设备外，还挂载了一个vlan interface eth1.10x ,该vlan interface 便是区分不同vlan的关键。每一个vlan network有一个对应的vlan id，该vlan id 对应相应数字的vlan interface。
 - 上图所示，有两个vlan,vlan 100 和vlan 101,vm1 与 vm2 在同一网络vlan100，是可以联通的，vm3 与vm1,vm2不连通。

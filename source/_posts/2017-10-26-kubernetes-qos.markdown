@@ -16,13 +16,13 @@ kubernetes最主要的功能是容器编排，而容器编排中第一个想到�
 
 看下kubernetes中大致的调度过程，图片来自[Kubernetes中的资源管理 ](http://oj6ydypm2.bkt.clouddn.com/Kubernetes%E4%B8%AD%E7%9A%84%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86_%E4%B8%81%E6%B5%B7%E6%B4%8B.pdf)：
 
-![k8s-scheduler](http://7xrnwq.com1.z0.glb.clouddn.com/20171026k8s-scheduler.jpg)
+![k8s-scheduler](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171026k8s-scheduler.jpg)
 
 再看下调度器的具体调度算法，大致分了两类，predicate和prioritizer：
 - predicate:一系列过滤函数将不满足的node排除
 - prioritizer: 对通过的节点按照一系列的算法进行优先级排序，最后选择优先级最高的。
 
-![kube-scheduler-algori](http://7xrnwq.com1.z0.glb.clouddn.com/20171026-kuber-scheduler-argo.jpg)
+![kube-scheduler-algori](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171026-kuber-scheduler-argo.jpg)
 
 简单介绍下常用的predicate 的几个算法：
 

@@ -82,7 +82,7 @@ class BooksController(RestController):
 
 默认的URL mapping 如下：
 
-![url-mapping](http://7xrnwq.com1.z0.glb.clouddn.com/pecan-restcontroller-url-mapping.jpg)
+![url-mapping](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/pecan-restcontroller-url-mapping.jpg)
 
 
 ## 配置文件

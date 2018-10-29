@@ -35,7 +35,7 @@ tags:
 
 注意：snapshot时，一定要对原rbd image 停止IO操作，否则会引起数据不一致。
 
-![snapshot](http://7xrnwq.com1.z0.glb.clouddn.com/snapshot.png)
+![snapshot](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/snapshot.png)
 
 跟git 实现版本控制类似，使用 COW （copy on write）方式实现。这里叙述下对某一pool中的某个image 进行snapshot 的过程：
 
@@ -49,7 +49,7 @@ tags:
 
 实验过程可以参考[理解 OpenStack + Ceph （4）：Ceph 的基础数据结构 [Pool, Image, Snapshot, Clone]](http://www.cnblogs.com/sammyliu/p/4843812.html),实验结论摘抄如下：
 
-![ceph-snap-cow](http://7xrnwq.com1.z0.glb.clouddn.com/2017-06-05-ceph-snap-cow.png)
+![ceph-snap-cow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-05-ceph-snap-cow.png)
 
 
 
@@ -58,13 +58,13 @@ tags:
 从用户角度来说，clone操作实现了对某个只读snapshot 的image化，即clone之后，可以对这个clone进行读写，snapshot等等，跟一个rbd image一样。
 从系统实现来说，也是利用 COW方式实现，clone会将clone与snapshot 的父子关系保存起来,以备IO操作时查找。
 
-![clone-cow](http://7xrnwq.com1.z0.glb.clouddn.com/2017-06-05-clone.png)
+![clone-cow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-05-clone.png)
 
 实验验证部分参考[理解 OpenStack + Ceph （4）：Ceph 的基础数据结构 [Pool, Image, Snapshot, Clone]](http://www.cnblogs.com/sammyliu/p/4843812.html)。
 
 结论摘抄如下：
 
-![cow-con](http://7xrnwq.com1.z0.glb.clouddn.com/2017-06-05-clone-coe-conclusion.png)
+![cow-con](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-05-clone-coe-conclusion.png)
 
 
 ## COW VS ROW

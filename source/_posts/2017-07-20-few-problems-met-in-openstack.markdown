@@ -12,13 +12,13 @@ tags:
 
 问题描述：虚拟机镜像为win7系统，配置为4cpu的时候，发现设备管理器显示为4cpu，但是任务管理器智能识别2cpu，如下图。
 
-![shebei](http://7xrnwq.com1.z0.glb.clouddn.com/2017-07-24-renwu.png)
+![shebei](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-07-24-renwu.png)
 
-![renwu](http://7xrnwq.com1.z0.glb.clouddn.com/2017-07-24-shebei.png)
+![renwu](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-07-24-shebei.png)
 
 问题解决：刚开始以为是win7系统引导项中限制到2核，更改后问题没有解决，更换镜像后问题依旧，后经过搜索得出答案:首先需要了解kvm的cpu虚拟化原理，可以参考[KVM 介绍（2）：CPU 和内存虚拟化](http://www.cnblogs.com/sammyliu/p/4543597.html),简单来说，一个KVM虚拟机就是一个Linux qemu-kvm进程，内存就是该进程的地址空间的一部分，虚拟机的vcpu作为线程运行在该进程的上下文，逻辑关系如下：
 
-![kvm-topology](http://7xrnwq.com1.z0.glb.clouddn.com/2017-07-24-kvm-topology.jpg)
+![kvm-topology](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-07-24-kvm-topology.jpg)
 我们用kvm命令创建虚拟机时有几个概念，
 ```bash
 $ kvm -m 2048 -smp 4,sockets=4,cores=1,threads=1 -drive file=win7_x64_pure 
@@ -36,7 +36,7 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
 
 问题描述：如题，对已经启动的虚拟机调整配额，没有反应。
 问题解决：找到对应计算节点，查看nova-compute日志发现错误原因，错误日志如下：
-![nova-compute-error](http://7xrnwq.com1.z0.glb.clouddn.com/2017-07-24-error-log.png)
+![nova-compute-error](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-07-24-error-log.png)
 
 无法ssh到目标节点，查阅相关资料后，得出resize命令需要设置nova用户在节点之间的passwordless authentication，解决如下：
  - sudo -u nova ssh-keygen   # 生成nova的密钥

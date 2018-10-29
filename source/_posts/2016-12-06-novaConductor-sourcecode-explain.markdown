@@ -347,7 +347,7 @@ def build_instances(self, context, instances, image, filter_properties,
 
  - 对nova boot在 Novaconductor的分析就完成了。简单从整体源码层面分析一下novaconductor,源码目录结构如下：
 
-![nova conductor](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-07-nova-conductor-code.png)
+![nova conductor](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-07-nova-conductor-code.png)
 
 一般来说，rpcapi.py都是与rpc相关的，别的服务只需导入该模块便可以使用它提供的远程调用Novaconductor的服务，Novaconductor注册的RPCServer接收到rpc请求，然后由manager.py中的ConductorManager真正完成数据库的访问。由于数据库访问的特殊性，api.py又对rpc.api做了一层封装，所以其他模块需要导入的是api.py，api.py的封装主要是区分访问数据库是否需要通过RPC,如果数据库就在本地host,那么无需通过RPC调用。所以api.py中包含了四个类：LocalAPI,API,LocalComputerTaskAPI,ComputerTaskAPI。前两个类是Novaconductor访问数据库的接口，后两个是TaskaAPI接口，TaskaAPI接口主要包含耗时较长的任务，比如新建虚拟机，迁移虚拟机等。如果Novacompute与Novaconductor模块在同一台机器上，那么不用通过RPC,直接通过LocalAPI访问数据库，同理TaskAPI也不需要RPC,使用LocalTaskAPI。看下nova/conductor/__init__.py
 
@@ -373,14 +373,14 @@ def ComputeTaskAPI(*args, **kwargs):
 
  - 接下来看下novaconductor与数据库交互的部分，在manager.py文件中有两个类，一个ConductorManager,一个ComputerTaskManager,对应两种API。与数据库交互的主要是ConductorManager。但当我打开这个类时瞬间懵圈了：
  
-  ![conductor-manager](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-07-conductor-manager.png)
+  ![conductor-manager](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-07-conductor-manager.png)
 
 类里面不是我们期待的数据库操作方法，而是关于object的一些方法。这里要讲下object Model。
 
  - Object Model算是nova访问数据库的分水岭。之前，对某一个表的操作都是放在一个同名文件中,例如flavor.py,使用时直接调用文件中的函数操作数据库。Object Model引入后，新建flavor对象与flavor表对应，将对flavor 的操作封装在flavor对象中。这么做的原因大致是：1，nova-computer 与数据库升级时的版本问题。2，减少写入数据库的数据量。3，数据库的传值类型问题。
   看下图Object Model 工作流程：
 
-   ![object model process](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-07-object-model.jpg)
+   ![object model process](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-07-object-model.jpg)
 
    novaComputer 与novaConductor不在同一个节点时，虚线为引入ObjectModel之前NovaComputer访问数据库的流程。实现表示引入objectModel后的流程。可以看到，Novacomputer需要做数据库的操作时，将通过ObjectModel调用nova.conductor.rpcapi.ConductorAPI提供的RPC接口，novaConductor 接受到RPC请求后，通过本地ObjectModel完成数据库的更新。
    ObjectModel的代码位于nova/objects目录，里面的每一个类对应数据库中的一个表，如下instance.py

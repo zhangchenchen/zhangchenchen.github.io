@@ -56,13 +56,13 @@ tags: openstack
 - 如果虚拟机是根据user-data来设定初始密码的，那么cloud-init只在第一次创建虚拟机执行一次，以后不会执行（reboot也不会执行）。那么我们也只能再次launch一下，方法如下。
 - 首先对当前虚拟机做一次snapshot.
 
- ![image-create](http://7xrnwq.com1.z0.glb.clouddn.com/2017-01-22-image-create.png)
+ ![image-create](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-01-22-image-create.png)
 
- ![image-snap](http://7xrnwq.com1.z0.glb.clouddn.com/2017-01-20-image-snap.png)
+ ![image-snap](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-01-20-image-snap.png)
 
 - 利用该snapshot ，设定好user-data重新boot 一个新的虚拟机
 
- ![snap-boot](http://7xrnwq.com1.z0.glb.clouddn.com/2017-01-20-snap-boot.png)
+ ![snap-boot](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-01-20-snap-boot.png)
 
 - 注意：此处只是保证系统盘数据是不变的，如果是数据盘的话还要将对应的数据盘detach再attch到新建的虚拟机中。当然，如果虚拟机是直接用的adminPass的话（即injectPassword的方式）也可以直接利用rebuild命令（rebuild只能用于image启动的instance,而不能用于volume 启动的instance）。
 

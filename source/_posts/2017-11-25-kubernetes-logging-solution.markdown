@@ -23,13 +23,13 @@ ELK Stack主要包括以下组件：
 
 ELK 的架构设计是跟业务息息相关的，如果是数据量比较小，可靠性要求不高，允许数据丢失的情况可以直接布单实例的ELK，大致如下：
 
-![elk-simple-infra](http://7xrnwq.com1.z0.glb.clouddn.com/20171127-elk-simple-infra.jpg)
+![elk-simple-infra](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171127-elk-simple-infra.jpg)
 
 日志搜集部分的logstash可以部署在多台机器上，当然，也可以采用其他日志收集工具，比如Filebeat，rsyslog，fluent等。这种架构每个环节都有单点故障的可能，而且没有分流的功能，一旦出现数据量激增的情况可能中间的某个组件就挂了。
 
 生产环境中会在上述架构的基础上增加一些高可用的特性，示例如下：
 
-![elk-pro-infra](http://7xrnwq.com1.z0.glb.clouddn.com/20171127elk-pro-infra.jpg)
+![elk-pro-infra](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171127elk-pro-infra.jpg)
 
 这里首先注意到的是增加了一个消息队列来削峰填谷，在收集数据完之后，这里还用logstash做了数据过滤，格式转换等数据处理工作（可选），elasticsearch采用集群的方式部署（图中未体现出来）。
 
@@ -42,26 +42,26 @@ ELK 的架构设计是跟业务息息相关的，如果是数据量比较小，�
 首先是pod级别的日志，默认指定程序输出到标准输出，然后就可以通过kubectl logs获取到日志。
 node级别的日志收集方案，首先要考虑的就是容器中程序产生的日志，这部分日志可以通过容器配置中的log-driver来对日志进行日志管理。其他程序的日志可以指定日志输出路径（比如/var/log）。值得注意的是，这个级别的解决方案需要一个logrotate组件来对日志文件进行管理。常用的log-driver如下：
 
-![log-criver](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-log-driver.jpg)
+![log-criver](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-log-driver.jpg)
 
 集群级别的日志解决方案，这种情况下就要使用ELK Stack了，同时还要考虑容器漂移问题。对于日志收集部分，有三种日志收集方案：
 - 使用节点日志agent:也就是在node级别进行日志收集。一般使用DaemonSet部署在每个node中。这种方式优点是耗费资源少，因为只需部署在节点，且对应用无侵入。缺点是只适合容器内应用日志必须都是标准输出。
-![node-agent](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-node-agent.jpg)
+![node-agent](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-node-agent.jpg)
 - 使用sidecar container作为容器日志agent：也就是在pod中跟随应用容器起一个日志处理容器，有两种形式：一种是直接将应用容器的日志收集并输出到标准输出（叫做Streaming sidecar container），如下图：
-![streaming-sidecar](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-streaming-sidecar.jpg)
+![streaming-sidecar](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-streaming-sidecar.jpg)
 
 还有一种是将应用容器日志直接输出到日志收集后端，也就是每一个pod中都起一个日志收集agent（比如logstash或fluebtd）。如下图：
-![sidecar-agent](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-side-car-logging-agent.jpg)
+![sidecar-agent](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-side-car-logging-agent.jpg)
 这种方式的优点是可以收集多种形式的日志(比如文件，socket等)，缺点是耗费资源较多，每个pod都要起一个日志收集容器，相对来说，Streaming sidecar container的形式比较折中，既能收集多种形式的容器，耗费资源也没有太多，因为起的日志处理容器仅仅是将多种形式的日志输出到标准输出而已。
 - 在应用容器中直接将日志推到存储后端。
-![exposing-directly](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-exposing-directly.jpg)
+![exposing-directly](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-exposing-directly.jpg)
 
 ## EFK 实践
 
 接下来是具体实践，以k8s项目的addon中的[EFK](https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/fluentd-elasticsearch)为例，因为版本不同，我这边的k8s是1.7.3,而github中的是1.8,所以yaml文件做了一些更改，主要是api-version的改变。
 
 首先说明一下该实践的大体架构：
-![efk](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-efk.jpg)
+![efk](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-efk.jpg)
 每个节点以daemonset的形式跑一个fluentd，收集节点日志，收集的数据存储到ES中，最终通过Kibana可视化。这种部署方式只能收集容器应用日志输出到标准输出。而且，因为没有对ES加验证，且存储方式不是持久存储，所以不能在生产环境中使用。
 
 ### 部署Elasticsearch
@@ -671,7 +671,7 @@ kubectl proxy --address='172.16.21.250' --port=8086 --accept-hosts='^*$'
 ```
 登录http://172.16.21.250:8086/api/v1/proxy/namespaces/kube-system/services/kibana-logging/app/kibana 即进入kibana的界面，在doscovery中 创建index,便可以看到ES中的日志数据了。
 
-![index-kibana](http://7xrnwq.com1.z0.glb.clouddn.com/20171128-kibana-index.jpg)
+![index-kibana](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171128-kibana-index.jpg)
 
 ### 问题汇总
 

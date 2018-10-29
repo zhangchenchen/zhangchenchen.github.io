@@ -138,7 +138,7 @@ curl http://127.0.0.1:2379/v2/keys/message -XDELETE  #删除
 
 ## 架构 & 原理介绍
 
-![etcd-arch](http://7xrnwq.com1.z0.glb.clouddn.com/etcd-arch-20170927110531.jpg)
+![etcd-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/etcd-arch-20170927110531.jpg)
 etcd主要分为四个部分:
 
 - HTTP Server： 用于处理用户发送的API请求以及其它etcd节点的同步与心跳信息请求。

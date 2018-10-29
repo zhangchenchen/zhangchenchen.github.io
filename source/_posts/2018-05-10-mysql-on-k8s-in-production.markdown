@@ -23,7 +23,7 @@ Mysql HA架构有很多种，具体选型时要考虑架构的HA level，支撑�
 - Shared-Nothing, Geographically-Replicated Clusters.
 
 这三个层次的可用性依次递增，不过复杂性也随之增加。
-![tradeoff](http://7xrnwq.com1.z0.glb.clouddn.com/20180510142133tradeoff.jpg)
+![tradeoff](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510142133tradeoff.jpg)
 
 ### Data Replication
 
@@ -31,7 +31,7 @@ Mysql HA架构有很多种，具体选型时要考虑架构的HA level，支撑�
 
 #### MYSQL 主从或主主半同步复制
 
-![replication](http://7xrnwq.com1.z0.glb.clouddn.com/20180510150744-replication.jpg)
+![replication](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510150744-replication.jpg)
 
 这种架构比较简单，使用原生半同步复制作为数据同步的依据,缺点是需要额外考虑haproxy、keepalived的高可用机制，而且完全依赖于半同步复制，如果半同步复制退化为异步复制，数据一致性无法得到保证，可以通过针对网络波动的半同步复制优化解决。
 
@@ -40,14 +40,14 @@ Mysql HA架构有很多种，具体选型时要考虑架构的HA level，支撑�
 
 MHA（Master High Availability）目前在MySQL高可用方面是一个相对成熟的解决方案，它由日本DeNA公司youshimaton（现就职于Facebook公司）开发，是一套优秀的作为MySQL高可用性环境下故障切换和主从提升的高可用软件。它主要解决的是master fail-over的情况下实现秒级切换且保证数据一致性。
 
-![mha](http://7xrnwq.com1.z0.glb.clouddn.com/20180510151622-mha1.jpg)
+![mha](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510151622-mha1.jpg)
 
 优点是操作非常简单，可以将任意slave提升为master，且MHA可以设定多个master,可用性提高，缺点是逻辑较为复杂，发生故障后排查问题，定位问题更加困难，且用perl开发，二次开发困难。
 除了MHA ,还有MMM(Master-Master replication managerfor Mysql，Mysql主主复制管理器)方案。
 
 #### SAN共享存储实现HA
 
-![san](http://7xrnwq.com1.z0.glb.clouddn.com/20180510152934-san.jpg)
+![san](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510152934-san.jpg)
 
 这种方案因为使用共享存储，不需要数据同步，不过专门的共享存储花销比较大，且需要专门的运维人员，适合一些土豪公司。
 
@@ -56,7 +56,7 @@ MHA（Master High Availability）目前在MySQL高可用方面是一个相对成
 DRBD是一种基于软件、基于网络的块复制存储解决方案，主要用于对服务器之间的磁盘、分区、逻辑卷等进行数据镜像，当用户将数据写入本地磁盘时，还会将数据发送到网络中另一台主机的磁盘上，这样的本地主机(主节点)与远程主机(备节点)的数据就可以保证实时同步。
 穷人版的SAN ,唯一不同的是没有使用SAN网络存储 ，而是使用local disk。由于是实时复制磁盘数据，性能会有影响。
 
-![drbd](http://7xrnwq.com1.z0.glb.clouddn.com/20180510153049-drbd.jpg)
+![drbd](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510153049-drbd.jpg)
 
 
 ### Clustered & Virtualized Systems
@@ -65,14 +65,14 @@ DRBD是一种基于软件、基于网络的块复制存储解决方案，主要�
 
 #### Mysql NDB CLUSTER
 
-![ndb](http://7xrnwq.com1.z0.glb.clouddn.com/20180510160922-ndb.jpg)
+![ndb](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510160922-ndb.jpg)
 
 国内用NDB集群的公司非常少。NDB集群不需要依赖第三方组件，全部都使用官方组件，能保证数据的一致性，某个数据节点挂掉，其他数据节点依然可以提供服务，管理节点需要做冗余以防挂掉。
 缺点是：管理和配置都很复杂，而且某些SQL语句例如join语句需要避免。
 
 #### MarianDB Galera Cluster
 
-![galera](http://7xrnwq.com1.z0.glb.clouddn.com/20180510161231-galera.jpg)
+![galera](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180510161231-galera.jpg)
 
 MariaDB Galera Cluster 是一套在mysql innodb存储引擎上面实现multi-master及数据实时同步的系统架构，业务层面无需做读写分离工作，数据库读写压力都能按照既定的规则分发到 各个节点上去。在数据方面完全兼容 MariaDB 和 MySQL。 
 

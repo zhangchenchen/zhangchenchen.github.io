@@ -31,7 +31,7 @@ tags: openstack
 
  - 进入novaclient的根目录，找到setup.cfg文件，找到入口函数
 
-  ![novaclientsetup](http://7xrnwq.com1.z0.glb.clouddn.com/20161130-setup.cfg.png)
+  ![novaclientsetup](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161130-setup.cfg.png)
   其实我们也可以在安装了novaclient的机器中执行 which nova 找到对应入口。
 
  - 进入novaclient.shell 的main函数，截取部分代码如下：

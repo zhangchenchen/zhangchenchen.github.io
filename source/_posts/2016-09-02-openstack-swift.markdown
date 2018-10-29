@@ -45,7 +45,7 @@ tags: openstack
 
 首先看下swift的整体架构：
 
-![swift_arvhitecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160902-swift_architecture.jpg)
+![swift_arvhitecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160902-swift_architecture.jpg)
 
 整体架构主要分为两部分，访问层（Access Tier）和存储层（Storage Node）。访问层最主要的有两部分，Proxy node 主要负责Http请求的的转发，还有一个负责用户身份的认证（Authentication）。可选的是一个负载均衡设备。
 
@@ -55,7 +55,7 @@ tags: openstack
 
 在每个Storage node 上存储的对象在逻辑上又分为三层：
 
-![swift 对象组织架构](http://7xrnwq.com1.z0.glb.clouddn.com/20160902swift-object-acchitectture.png)
+![swift 对象组织架构](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160902swift-object-acchitectture.png)
 
 相应的，Storage node 中运行着三种对应的服务：
 
@@ -72,7 +72,7 @@ tags: openstack
 
 至于swift 中是如何具体实现该算法的就不详细叙述了。下图为大致架构图：
 
-![openstack-swift-logic-architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160904-openstack-swift-logic-architecture.png)
+![openstack-swift-logic-architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160904-openstack-swift-logic-architecture.png)
 
 
 <a name="C"></a>
@@ -104,7 +104,7 @@ swift API 的执行过程大致如下：swiftClient 将用户的命令转换为�
 
 ## swift 源码目录结构
 
-![swift source code](http://7xrnwq.com1.z0.glb.clouddn.com/20160904-openstack-swift-sourcecode.jpg)
+![swift source code](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160904-openstack-swift-sourcecode.jpg)
 
  - bin: 主要是一些启动脚本，工具脚本。比如proxy-server负责启动proxy server，swift-ring-builder 用来创建ring。
  - swift：swift的核心代码。其子目录account,container,obj,proxy分别对应相应的服务的具体实现。common子目录是被多个组件共用的公共代码。

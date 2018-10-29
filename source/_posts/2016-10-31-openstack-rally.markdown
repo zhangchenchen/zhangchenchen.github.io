@@ -28,7 +28,7 @@ rally以一种插件式的形式工作，对openstack是无侵入的。通常会
 tips:
 随着rally项目的不断发展，rally又衍生出了其他的一些功能，比如与tempest结合进行openstack的功能测试等。如下图
 
-![rally action](http://7xrnwq.com1.z0.glb.clouddn.com/20161031Rally-Actions.png)
+![rally action](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161031Rally-Actions.png)
 
 deploy(部署)功能并非是另一种部署方式，只是与devstack等部署方式以插件形式结合来简化工作而已。
 
@@ -41,9 +41,9 @@ rally 安装比较简单，还可以跟Devstack 部署时一块安装，以及do
 安装完成之后我们就可以进行性能测试了，大致顺序如下：
 
  - 创建一个openstack 的rally测试环境：如果是有现成的openrc文件，那么直接source 一下，然后执行：  rally deployment create --fromenv --name=existing 就创建完成了。也可以将openrc文件中的内容写入一个json文件，假设取名为existing.json,执行如下命令： rally deployment create --file=existing.json --name=existing 。 执行rally deployment list 即可查看我们创建的deployment 以及哪一个正在被激活（正在使用）。
- ![rally deployment](http://7xrnwq.com1.z0.glb.clouddn.com/20161031rally2.png)
+ ![rally deployment](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161031rally2.png)
  通过 rally deployment check 可查看检测到的openstack服务：
- ![rally check](http://7xrnwq.com1.z0.glb.clouddn.com/20161031rally1.png)
+ ![rally check](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161031rally1.png)
 
  - 创建完一个deployment之后我们就可以进行测试了，我们需要指定一个json或yaml文件 来说明测试的内容， 在rally安装目录samples/tasks/scenarios 中有很多示例文件，比如samples/tasks/scenarios/nova 目录下就有nova对应的情景测试文件，例如boot-and-delete.json，就是启动虚拟机再删除操作，内容如下：
 
@@ -82,7 +82,7 @@ rally 安装比较简单，还可以跟Devstack 部署时一块安装，以及do
  - rally提供了多种方式进行结果的查看，最直观的就是以html形式在浏览器中展现（需翻墙）：
   rally task report --out=report1.html --open 
   
-  ![rally pic](http://7xrnwq.com1.z0.glb.clouddn.com/20161031rally3.png)
+  ![rally pic](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161031rally3.png)
 
 
 tips:执行任务时指定的json 文件格式如下：
@@ -118,7 +118,7 @@ rally任务启动配置文件就是上文中提到过的json/yaml文件，其实
 
 rally插件就是我们在json文件中配置的ScenarioName，通过这些插件的组合可以完成我们自己定义的要求。几个命令如下：
 
-![rally plugin](http://7xrnwq.com1.z0.glb.clouddn.com/20161031rallyplugin.png)
+![rally plugin](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161031rallyplugin.png)
 
 关于rally与tempest的结合使用还不是很成熟，感兴趣的可以去试下，[check this!](http://rally.readthedocs.io/en/latest/tutorial/step_10_verifying_cloud_via_tempest.html)
 

@@ -23,7 +23,7 @@ ceph rbd是基于 rados来做的，也就是说，一个 rbd image 首先会被�
 
 对于openstack来说，通常是通过libvirt 来控制磁盘的虚拟化(比如qemu),再通过qemu来与rbd打交道，如下图：
 
-![ceph-rbd-qemu](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-03-openstack-ceph-rbd.png)
+![ceph-rbd-qemu](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-03-openstack-ceph-rbd.png)
 
 qemu会调用librbd 实现rbd的增删改查等一系列操作，当然也有配套的 qemu命令，详见[QEMU 与块设备](http://docs.ceph.org.cn/rbd/qemu-rbd/)
 
@@ -77,7 +77,7 @@ $ rbd snap purge {pool-name}/{image-name} # 清除某一镜像的所有快照
 
 Ceph 支持为某一rbd snapshot创建很多个写时复制（ COW ）克隆。所谓写时复制，就是执行 clone命令后，并没有立即执行clone操作，而是引用原文件，当发生写入操作时才真正执行clone操作。
 
-![rbd-cow](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-03-ceph-cow.png)
+![rbd-cow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-03-ceph-cow.png)
 
 注意： clone只能用于 protected 的snapshot,且仅支持克隆 format 2 的映像（即用 rbd create --image-format 2 创建的）。
 
@@ -87,7 +87,7 @@ Ceph 支持为某一rbd snapshot创建很多个写时复制（ COW ）克隆。�
 
 clone 的 步骤如下：
 
-![clone-process](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-03-clone-process.png)
+![clone-process](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-03-clone-process.png)
 
 相关命令如下：
 

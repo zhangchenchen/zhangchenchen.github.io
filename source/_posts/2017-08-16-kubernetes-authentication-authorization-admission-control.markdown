@@ -12,7 +12,7 @@ tags:
 首先需要了解这三种机制的区别：简单来说，认证(Authenticating)是对客户端的认证，通俗点就是用户名密码验证，授权(Authorization)是对资源的授权，k8s中的资源无非是容器，最终其实就是容器的计算，网络，存储资源，当一个请求经过认证后，需要访问某一个资源（比如创建一个pod），授权检查都会通过访问策略比较该请求上下文的属性，（比如用户，资源和Namespace），根据授权规则判定该资源（比如某namespace下的pod）是否是该客户可访问的。准入(Admission Control)机制是一种在改变资源的持久化之前（比如某些资源的创建或删除，修改等之前）的机制。
 在k8s中，这三种机制如下图：
 
-![k8s-authorization](http://7xrnwq.com1.z0.glb.clouddn.com/2017-08-17-k8s-authorition.png)
+![k8s-authorization](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-17-k8s-authorition.png)
 
 k8s的整体架构也是一个微服务的架构，所有的请求都是通过一个GateWay，也就是kube-apiserver这个组件（对外提供REST服务），由图中可以看出，k8s中客户端有两类，一种是普通用户，一种是集群内的Pod，这两种客户端的认证机制略有不同，后文会详述。但无论是哪一种，都需要依次经过认证，授权，准入这三个机制。
 
@@ -172,7 +172,7 @@ type: kubernetes.io/service-account-token
 
 类似 OAuth2的认证方式，大致认证过程如下：
 
-![openID](http://7xrnwq.com1.z0.glb.clouddn.com/2017-08-17-k8s-openid-token.jpg)
+![openID](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-17-k8s-openid-token.jpg)
 
 除了以上几种认证方式外，还有几种比如Webhook Token Authentication，Keystone Password等，详情见[官网](https://kubernetes.io/docs/admin/authentication/#x509-client-certs)。
 

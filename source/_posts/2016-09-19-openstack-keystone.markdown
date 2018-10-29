@@ -36,7 +36,7 @@ keystone 提供的服务可以概括为以下四个方面：
 
 以创建虚拟机为例，keystone 的大致工作流程如下(注：以下内容摘自[<<openstack设计与实现>>](https://book.douban.com/subject/26374647/))：
 
-![keystone process](http://7xrnwq.com1.z0.glb.clouddn.com/20160918Keystone-process.png)
+![keystone process](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160918Keystone-process.png)
 
  - 用户Alice发送自己的凭证到keystone，keystone认证通过后，返回给Alice一个token以及服务目录。
  - Alice通过token请求keystone查询他所拥有的Tenant列表。（如果已经知道Tenant，略过以上两步）
@@ -51,7 +51,7 @@ keystone 提供的服务可以概括为以下四个方面：
 
 ## keystone 的架构
 
-![keystone-architecture](http://7xrnwq.com1.z0.glb.clouddn.com/20160919-openstack-keystone-architecture.png)
+![keystone-architecture](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160919-openstack-keystone-architecture.png)
 
 keystone还涉及另外一个子项目，keystonemiddleware,它提供了对token合法性进行验证的中间件。比如：客户端访问keystone提供的资源时用的是PKI类型的token，为了不必每次都需要keystone介入token的验证，我们通常会在本地节点上缓存相关证书和密钥，利用keystonemiddleware对token进行验证。
 
@@ -76,11 +76,11 @@ PKI详细介绍，[check this!](https://en.wikipedia.org/wiki/Public_key_infrast
 
 下图为UUID的token验证流程：
 
-![uuid token valid](http://7xrnwq.com1.z0.glb.clouddn.com/20160919UUID-token-validation-flow-3.png)
+![uuid token valid](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160919UUID-token-validation-flow-3.png)
 
 下图为PKI的token验证流程：
 
-![pki token valid](http://7xrnwq.com1.z0.glb.clouddn.com/20160919PKI-token-validation-flow-1.png)
+![pki token valid](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160919PKI-token-validation-flow-1.png)
 
 
 <a name="D"></a>

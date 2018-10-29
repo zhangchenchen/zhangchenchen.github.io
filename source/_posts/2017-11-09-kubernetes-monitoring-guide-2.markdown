@@ -28,7 +28,7 @@ Prometheus 是一个开源的系统监控预警工具，由Soundcloud开发并�
 
 Prometheus的整体架构如下：
 
-![prometheus-arch](http://7xrnwq.com1.z0.glb.clouddn.com/201711-12-prometheous-arch.jpg)
+![prometheus-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/201711-12-prometheous-arch.jpg)
 
 由上图可以看出Prometheus的几个重要组件：
 - Prometheus Server：主要负责数据采集，存储，提供PromQL查询语言的支持。
@@ -598,18 +598,18 @@ spec:
 
 如果以上pod都运行正常，那么prometheus大致安装完成了，接下来查看prometheus service对应的nodeport，然后就可以通过浏览器访问该service了。
 
-![prometheus-pic](http://7xrnwq.com1.z0.glb.clouddn.com/20171112-proemeus3.jpg)
+![prometheus-pic](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171112-proemeus3.jpg)
 
 点击“status”中的target，可以看到所有的数据来源状态：
 
-![prometueus-pic2](http://7xrnwq.com1.z0.glb.clouddn.com/201711121-prometueus-target.jpg)
+![prometueus-pic2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/201711121-prometueus-target.jpg)
 
 ## Grafana安装部署
 
 Grafana的具体安装部署过程就不再赘述了，比较简单，之前的博客中有详细教程，这里只说一下与prometueus对接的配置。
 其实也比较简单，就是一个添加数据源的操作。
 进入grafana界面，点击datasource，进入添加datasource的界面。
-![grafana-data-source](http://7xrnwq.com1.z0.glb.clouddn.com/20171112-datasource.jpg)
+![grafana-data-source](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171112-datasource.jpg)
 
 然后添加prometueus暴露出的cluster-ip:port即可，也可以用service名称代替，不过要加上namespace，比如：http://prometheus.monitoring:9090 。测试成功即可。
 
@@ -942,7 +942,7 @@ spec:
 ```
 
 创建完成后，可以通过alertmanager service的nodeport进入alertmanager 的管理界面，里面有一些设置选项，如下：
-![alert-manager](http://7xrnwq.com1.z0.glb.clouddn.com/QQ%E6%88%AA%E5%9B%BE20171114140712.jpg)
+![alert-manager](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/QQ%E6%88%AA%E5%9B%BE20171114140712.jpg)
 
 具体设置可以参考[Prometheus监控 - Alertmanager报警模块](https://sagittariusyx.github.io/2016/03/07/prometheus-alertmanager/)。
 可以通过stop 某个节点的kubelet程序的方式测试一下报警模块是否运行正常。

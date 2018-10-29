@@ -26,11 +26,11 @@ tags: git
 
  - 项目中搜索含有某个关键字的文件：在github 项目的code目录按下 "t",即可进入搜索页面，如下图：
  
- ![search](http://7xrnwq.com1.z0.glb.clouddn.com/20161017github-search.jpg)
+ ![search](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161017github-search.jpg)
 
  - 列出github的快捷键：在项目目录按下 “？” 即可出现：
 
-![github shortcut](http://7xrnwq.com1.z0.glb.clouddn.com/20161017shortcut.jpg)
+![github shortcut](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161017shortcut.jpg)
 
  - 进入 issue页面：按下“g” 与 “i”键，就是goto issue 的缩写
  - 进入code页面：按下“g”与“c”键，goto code

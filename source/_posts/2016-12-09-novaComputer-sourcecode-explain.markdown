@@ -282,7 +282,7 @@ def spawn(self, context, instance, image_meta, injected_files,
 
  - novacomputer 代码目录如下：
 
-![nova-computer-code](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-09-nova-computer-code.png)
+![nova-computer-code](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-09-nova-computer-code.png)
 
 
  - Resource Tracker:

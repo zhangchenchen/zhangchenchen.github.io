@@ -86,7 +86,7 @@ MQ组件的对比可以参考阿里中间件团队做的压测[RocketMQ与kafka�
 
 以上是按照数据处理的流程来区分的，这里从网上找到一张由下而上的整体架构：
 
-![data-bricks](http://7xrnwq.com1.z0.glb.clouddn.com/2017-12-27-databricks.jpg)
+![data-bricks](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-12-27-databricks.jpg)
 
 
 ## 参考文章

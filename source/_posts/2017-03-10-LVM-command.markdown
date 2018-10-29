@@ -27,7 +27,7 @@ LVM的基本组成块如下：
  - 卷组Volume group (VG)：将一组物理卷收集为一个管理单元。
  - 逻辑卷Logical volume (LV)：虚拟分区，由物理区域（physical extents）组成。
 
-![lvm-pic](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-10-lvm-500x290.jpg)
+![lvm-pic](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-500x290.jpg)
 
 
 ## 对虚拟机进行手动扩容

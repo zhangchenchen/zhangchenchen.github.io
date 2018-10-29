@@ -25,7 +25,7 @@ tags: ceph
 ## 监视器MON故障排除
 
  
-![ceph-mon-trouble-shot](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-21-ceph-mon-trouble-shotting.png)
+![ceph-mon-trouble-shot](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-21-ceph-mon-trouble-shotting.png)
 
 简单记下修复 monmap的过程：
 

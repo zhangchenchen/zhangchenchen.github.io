@@ -17,7 +17,7 @@ tags: openstack
 
 - 首先简单看下V1 代码与V2 代码的目录结构：
 
-![v1-vs-v2](http://7xrnwq.com1.z0.glb.clouddn.com/201612-15-openstack-glance-v1-v2.png)
+![v1-vs-v2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/201612-15-openstack-glance-v1-v2.png)
 
 也可以明显看出V2相对V1加了许多API。
 

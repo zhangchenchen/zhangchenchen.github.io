@@ -21,14 +21,14 @@ kubernetes本身是不提供网络方案的，我们需要通过addon的方式�
 
 性能对比，博主找到了两篇相对靠谱的文章，一篇是从hacker news上面找到的，后来发现了[中文翻译版](http://dockone.io/article/1115)，这篇文章主要是对比了Docker host方案，flannel，IPVlan三种方案，这里提一嘴IPVlan，它是 Linux 内核中的一个驱动，有了它，无需使用桥接接口，就可以创建拥有唯一 IP 地址的虚拟网络接口。IPvlan 是一个相对较新的解决方案，现在还没有能完成上述过程的自动化工具。如果集群的机器和容器比较多，部署 IPvlan 的难度不小，不容易设置。直接上这篇文章的结论吧：
 
-![test-result](http://7xrnwq.com1.z0.glb.clouddn.com/2017121-test-result.jpg)
+![test-result](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017121-test-result.jpg)
 总结一下就是私有云环境下flannel + host-gw方案顶呱呱。
 
 第二篇文章是来自网友@Kelvin Peng，覆盖的方案范围比较广，详情可参考[Docker network on cloud](http://cmgs.me/life/docker-network-cloud)，这里直接贴测试结果：
 
-![yourong-test-result-1](http://7xrnwq.com1.z0.glb.clouddn.com/20171211-test-result-you-1.jpg)
+![yourong-test-result-1](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171211-test-result-you-1.jpg)
 
-![yourong-test-result-2](http://7xrnwq.com1.z0.glb.clouddn.com/20171211-test-result-you-2.jpg)
+![yourong-test-result-2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171211-test-result-you-2.jpg)
 
 再次说一下，以上测试仅供参考，性能测试是一个罗生门，具体的网络方案还是得看实际应用场景，是私有云环境，公有云环境，还是混合云环境，有无SDN，节点数量，集群规模等等，最朴素的判断Underlay 网络性能确实优于 Overlay 网络，但是Overlay 较 Underlay 可以支持更多的二层网段，能更好地利用已有网络，以及有避免物理交换机 MAC 表耗尽等优势，所以在方案选型的时候需要综合考虑。
 
@@ -37,7 +37,7 @@ kubernetes本身是不提供网络方案的，我们需要通过addon的方式�
 
 没想到搜到了一篇学长的[博客](http://chunqi.li/2015/11/15/Battlefield-Calico-Flannel-Weave-and-Docker-Overlay-Network/#Conclusion)，翻了一下他的linkedin，立马汗颜，扯远了，文章写的很详细，省的自己整理了，还是直接贴结论，详情去看文章吧。
 
-![k8s-network-feature-compare](http://7xrnwq.com1.z0.glb.clouddn.com/20171211-feature-comparation.jpg)
+![k8s-network-feature-compare](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171211-feature-comparation.jpg)
 
 
 ## 参考文章

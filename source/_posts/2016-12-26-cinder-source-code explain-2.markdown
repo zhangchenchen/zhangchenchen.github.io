@@ -52,7 +52,7 @@ console_scripts =
 ## 以新建 cinder volume 为例 深入 cinder 代码
 
 首先看下cinder --debug create volume 都发送了那些请求：
-![cinder create api](http://7xrnwq.com1.z0.glb.clouddn.com/2016-12-26-cinder-create-api.png)
+![cinder create api](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-26-cinder-create-api.png)
 
 可以看到先去keystone验证，然后向cinder-api发送一个v2/{tenant-id}/volumes 的post请求，volume创建，然后发送一个v2/{tenant-id}/volumes/{volume-id} 的get请求获取创建的volume数据。
 

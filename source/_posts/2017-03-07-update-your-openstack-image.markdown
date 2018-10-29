@@ -97,7 +97,7 @@ $ kpartx -d  centos7-x86_64.img # 删除设备映射关系
 
 如下为一个完整实例（省略chroot操作）：
 
-![chroot-lvm](http://7xrnwq.com1.z0.glb.clouddn.com/2017-03-08-chroot-lvm.png)
+![chroot-lvm](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-08-chroot-lvm.png)
 
 
 #### 镜像格式为qcow2格式

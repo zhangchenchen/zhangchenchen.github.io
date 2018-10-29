@@ -55,11 +55,11 @@ saltstalk是典型的CS架构，主要分两种角色，master和minions,master�
  - job管理器：可以实现对minion job的发送信号，定时调度等
  - job 返回数据管理：系统默认返回数据存储在Job cache（默认是在/var/cache/salt/master/jobs目录）中，还有其他两种存储模式：一种是External Job Cache，如下图
 
-![External Job Cache](http://7xrnwq.com1.z0.glb.clouddn.com/20161107external-job-cache.png)
+![External Job Cache](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161107external-job-cache.png)
 
 另一种是Master Job Cache，如下图：
 
-![Master Job Cache](http://7xrnwq.com1.z0.glb.clouddn.com/20161107master-job-cache.png)
+![Master Job Cache](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161107master-job-cache.png)
 
  - returner: 我们可以在master端执行远程指令时指定returner,这样minion返回的数据不仅会返回到master，也会返回到我们指定的returner。而且我们也可以按照要求实现一个returner，来替换我们的Default Job Cache。
 

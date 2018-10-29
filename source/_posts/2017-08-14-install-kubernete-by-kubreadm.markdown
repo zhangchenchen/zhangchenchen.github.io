@@ -18,7 +18,7 @@ tags:
 
 准备以下5个节点，一个为k8s的master节点，3个为node节点，最后一个作为私有仓库镜像，系统为centos7.2：
 
-![five-nodes](http://7xrnwq.com1.z0.glb.clouddn.com/2017-08-14-node.png)
+![five-nodes](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-14-node.png)
 
 注：k8s的安装方式有很多，kubeadm安装方式是独立节点安装的官方推荐方式，简单可重复，但不适用于生产环境，因为没有做HA，不过可以在安装完之后继续优化做HA，参考[一步步打造基于Kubeadm的高可用Kubernetes集群](http://tonybai.com/2017/05/15/setup-a-ha-kubernetes-cluster-based-on-kubeadm-part1/),后续会跟进这一块。
 
@@ -132,7 +132,7 @@ systemctl enable kubelet && systemctl start kubelet
 
 接下来开始基于Kubeadm 创建k8s集群，不过在开始之前，我们先准备下需要用到的镜像，因为kubeadm创建的k8s集群中的kub-api, kube-scheduler, kube-proxy, kube-controller-manager,etcd等服务都是直接拉取镜像跑在k8s集群中，为了避免安装过程中下载镜像浪费太多时间，这里先把镜像下载好。各个版本需要下载的镜像版本也不一样。参考如下：
 
-![k8s-image](http://7xrnwq.com1.z0.glb.clouddn.com/2017-08-14-k8s-image.png)
+![k8s-image](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-14-k8s-image.png)
 
 我们直接用的最新版1.7.3，如果服务器可以翻墙，直接拉取镜像：
 

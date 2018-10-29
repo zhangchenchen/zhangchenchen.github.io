@@ -36,7 +36,7 @@ In short，neutron就是openstack为实现云平台上networking as a service而
 
  由openstack administrator 创建的network，在数据中心中映射物理网络。通常的类型为flat或Vlan
 
- ![Provider networks](http://7xrnwq.com1.z0.glb.clouddn.com/20160819NetworkTypes.png)
+ ![Provider networks](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160819NetworkTypes.png)
 
  3, Subnet 
 
@@ -46,7 +46,7 @@ In short，neutron就是openstack为实现云平台上networking as a service而
 
  port 是一个设备的连接点，例如一台虚拟机的虚拟网卡。同时描述了相关的网络配置，例如该端口的MAC地址与IP地址。
 
- ![部分核心概念](http://7xrnwq.com1.z0.glb.clouddn.com/20160819neutron_core_entities.png)
+ ![部分核心概念](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160819neutron_core_entities.png)
 
  5, [Vlan VS Vxlan](https://ask.openstack.org/en/question/51388/whats-the-difference-between-flat-gre-and-vlan-neutron-network-types/)
 
@@ -90,7 +90,7 @@ In short，neutron就是openstack为实现云平台上networking as a service而
 
 ## 架构与原理
 
-![neutron架构图](http://7xrnwq.com1.z0.glb.clouddn.com/20160819-NEUTRON-ARCHITECTURE.png)
+![neutron架构图](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20160819-NEUTRON-ARCHITECTURE.png)
 
 Neutron，其实和其他的OpenStack组件差不多，他都是一个中间层，自己基本不干具体的活，通过插件的机制，调用第三方的组件来完成相关的功能。
 

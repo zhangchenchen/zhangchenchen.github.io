@@ -50,18 +50,18 @@ tags: openstack
 
 1. 利用user-data注入：我司的云平台就是使用这种方式，用法很简单
 
-    ![user-data](http://7xrnwq.com1.z0.glb.clouddn.com/2017-1-13-cloud-init-test.png)
+    ![user-data](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-1-13-cloud-init-test.png)
 
     cloud-init数据源是采用最广泛的EC2模式，EC2的restAPI相关知识[check this](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html#instancedata-add-user-data)。关于metadata  server的配置不在描述，主要是Nova，和Neutron 的相关配置（默认配置即可）。
     登录到对应的虚拟机验证下：
 
-    ![metadata](http://7xrnwq.com1.z0.glb.clouddn.com/2017-01-13-metadata.png)
+    ![metadata](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-01-13-metadata.png)
 
     关于metadata和userdata的服务机制,参考[OpenStack 的 metadata 服务机制](http://www.ibm.com/developerworks/cn/cloud/library/1509_liukg_openstackmeta/)
 
 2. 修改cloud-init的方式：注意在执行命令nova boot的时候会生成一个adminPass的字段。当然，如果你想用自己的密码，也可以在meta中指定，然后修改下代码即可，参考[这里](https://segmentfault.com/a/1190000002878435) 。
      
-     ![adminPass](http://7xrnwq.com1.z0.glb.clouddn.com/2017-01-14-adminPass.png) 
+     ![adminPass](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-01-14-adminPass.png) 
 
     我们可以获取该字段，然后交给cloud-init进行密码的设置。前文所说，虚机在通过cloud-init获取元数据时可以使用api-metadata、ConfigDrive等方式，但是因为只有ConfigDrive方式才会把adminPass字段传递给虚机，所以这里我们只能用config drive的方式。关于config drive的使用方式，[check this](http://www.voidcn.com/blog/wuyongpeng0912/article/p-6099231.html) 。而且，为了能够使cloud-init获取到该字段，需要加个patch:
 
