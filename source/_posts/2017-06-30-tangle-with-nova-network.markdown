@@ -24,22 +24,22 @@ nova-network 支持两种网络类型（确切地说是三种，这里将Flat与
 
 这里借上文中的一张图简单说下flat这种网络类型，以多节点，多网卡为例：
 
-![multi-host-1](http://oeptotikb.bkt.clouddn.com/2017-06-30-FlatNetworkMultInterface.png)
+![multi-host-1](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-FlatNetworkMultInterface.png)
 
 由图看出，计算节点内都有一个网桥br100与 物理网卡eth0相连，计算节点内的虚拟机通过该网桥与控制节点的对应物理网卡连接实现通信。
 虚拟机实现南北通信大致如下图：
 
-![multi-host-2](http://oeptotikb.bkt.clouddn.com/2017-06-30-MultiInterfaceOutbound_2.png)
+![multi-host-2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-MultiInterfaceOutbound_2.png)
 
 flatDHCP 其实就是在计算节点再运行一个dnsmasp来提供DHCP服务，就不需要借助外部的DHCP服务，两者对比大致如下：
 
 flat networking :
 
-![flat](http://oeptotikb.bkt.clouddn.com/2017-06-30-flatdhcp.png)
+![flat](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-flatdhcp.png)
 
 flatDHCP networking:
 
-![flat-dhcp](http://oeptotikb.bkt.clouddn.com/QQ%E6%88%AA%E5%9B%BE20170630144105.png)
+![flat-dhcp](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/QQ%E6%88%AA%E5%9B%BE20170630144105.png)
 
 
 ### VlanManager
@@ -56,7 +56,7 @@ vlan 网络或给每个租户创建一个（或多个）二层网络，且这些
 
 Flat类型的基本上上文已经讲了，主要看下flatDHCP 的实现：
 
-![flat-dhcp](http://oeptotikb.bkt.clouddn.com/2017-06-30-flat-dhcp-real.png)
+![flat-dhcp](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-flat-dhcp-real.png)
 
 跟flat类似，不过在计算节点的网桥上会有一个dnsmasq进程监听并实现该节点的虚拟机IP动态分配。
 还有一点要注意的是，不同计算节点的虚拟机内网关也不同，比如，上图中，vm_1与vm_2的网关都是10.10.0.1，但在右边计算节点的vm_3 和vm_4的网关却是10.10.0.4。
@@ -65,12 +65,12 @@ Flat类型的基本上上文已经讲了，主要看下flatDHCP 的实现：
 
 一图胜千言：
 
-![multi-host-vlan](http://oeptotikb.bkt.clouddn.com/2017-06-30-vlanmanager-2-hosts-2-tenants.png)
+![multi-host-vlan](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-vlanmanager-2-hosts-2-tenants.png)
 
 上面这幅图就是vlan模式部署最为广泛的场景，即multi-node模式，也就是说不光是网络节点需要运行nova-network服务，计算节点也要运行nova-network（还需要运行nova-api以提供metadata服务），这样就避免出现SPOF,也可以达到分流的作用（跟neutron 的DVR很类似，估计DVR就是借鉴了这里）。
 需要注意的是每个vlan网桥都是租户独占的，且会创建vlan接口如vlan102,依据802.1q协议打vlanid，与网关eth0连接。Dnsmasq监听网桥网关，负责fixedip的分配。switch port设定为chunk mode。eth0负责vm之间的数据通信，另一网卡如eth1负责外网访问。上图只是显示了一个网卡，如下图是一个多网卡的情况：
 
-![vlan-multi-host](http://oeptotikb.bkt.clouddn.com/2017-06-30-multi-host-vlan.png)
+![vlan-multi-host](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-30-multi-host-vlan.png)
 
 
 ## nova-network vs neutron

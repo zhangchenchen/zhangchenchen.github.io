@@ -18,7 +18,7 @@ tags:
 
 spark 中的事件机制本质上就是观察者模式的实现。只不过封装的层次太多，不容易发现，下图是相关类的整体视图呈现。
 
-![spark-event-class-view](http://oeptotikb.bkt.clouddn.com/2018-09-16-spark-event-bus.png)
+![spark-event-class-view](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-09-16-spark-event-bus.png)
 
 先理清几个概念：
 - Event: spark 中定义的一个事件（比如一个app/job/stage/task的启动/关闭等）。

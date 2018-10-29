@@ -16,7 +16,7 @@ tags:
 ## 架构
 
 整体大致架构如下：
-![cloud-arch](http://oeptotikb.bkt.clouddn.com/k8s-arch.jpg)
+![cloud-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/k8s-arch.jpg)
 
 因为没有公有云的加入，算是一个比较简单的架构，基本功能包括容器应用的构建，管理，镜像管理（采用Harbor），权限管理，以及针对集群的监控，日志管理等等。因为是第一版，没有将devops放进来，可能年前会发一个小版本加进来。
 

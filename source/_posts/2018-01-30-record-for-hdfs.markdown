@@ -92,7 +92,7 @@ administrator可以通过命令行或其他的方式进行设置。
 - QJM：the Quorum Journal Manager，这种方案是通过JournalNode共享EditLog的数据，使用的是Paxos算法（zookeeper就是使用的这种算法），保证活跃的NameNode与备份的NameNode之间EditLog日志一致,配合zookeeper可以实现自动切换,推荐使用。
 - NFS：Network File System 或 Conventional Shared Storage，传统共享存储，其实就是在服务器挂载一个网络存储（比如NAS），Active NameNode将EditLog的变化写到NFS，备份NameNode检查到修改就读取过来，是两个NameNode数据一致,缺点是如果namenode或者standby namenode与NFS磁盘之间的网络出了问题，HA即失效。
 
-![HDFS-HA](http://oeptotikb.bkt.clouddn.com/2018-2-2-HDFS-HA.jpg)
+![HDFS-HA](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-2-2-HDFS-HA.jpg)
 
 以上是QJM HA的典型的结构图。集群中共有两个namenode(简称NN)，其中只有一个是active状态，另一个是standby状态。active 的NN负责响应DN(datanode)的请求，为了最快的切换为active状态，standby状态的NN同样也连接到所有的datenode上获取最新的块信息(blockmap)。
 active NN会把元数据的修改(edit log)发送到多数的journal节点上(2n+1个journal节点，至少写到n+1个上)，standby NN从journal节点上读取edit log，并实时的合并到自己的namespace中。另外standby NN连接所有DN，实时的获取最新的blockmap。这样，一旦active的NN出现故障，standby NN可以立即切换为active NN.
@@ -108,7 +108,7 @@ active NN会把元数据的修改(edit log)发送到多数的journal节点上(2n
 - 第三方权限控制Ranger
 - Hadoop POSIX ACLs
 
-![hadoop-auth](http://oeptotikb.bkt.clouddn.com/2018-02-02Hadoop%20Range.png)
+![hadoop-auth](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-02-02Hadoop%20Range.png)
 
 认证部分有两种方式，simple和kerberos，simple不做任何处理，会由操作系统层获取用户，客户端可以通过设置环境变量HADOOP_USER_NAME来伪装用户。kerberos认证对集群里的所有机器都分发了keytab，使得集群机器进程之间不能随便访问。
 代理部分：当客户端访问hadoop时，并不想以当前进程用户去调用，上层应用一般有自己一套用户管理体系，所以hadoop提供代理机制，让进程用户可以代理登录用户提交请求。然而，如果对代理用户不加以控制的话，那权限便相对于无限放大，比如代理超级用户：hdfs，yarn等，所以对于进程用户会设置可在哪些主机提交请求和代理哪些用户组成员。 

@@ -56,9 +56,9 @@ $ cinder backup-create  --name incrementalbackup --incremental <volume-ID>
 
 关于备份的具体流程可以参考这张图：
 
-![backup-workflow](http://oeptotikb.bkt.clouddn.com/backup_workflow.png)
+![backup-workflow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/backup_workflow.png)
 
-![detail-backup](http://oeptotikb.bkt.clouddn.com/2017-05-10-backup-detail.jpg)
+![detail-backup](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-05-10-backup-detail.jpg)
 
 熟悉ceph的话，应该知道ceph rbd的export-diff，import-diff 功能：
 

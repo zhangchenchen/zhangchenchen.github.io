@@ -18,7 +18,7 @@ Cobbler可以看做是在kickstart项目上的一层封装，融合了DHCP,TFTP�
 
 Cobbler 是典型的CS架构，我们只需要在服务端做好相应的安装配置，客户端设置PXE网络启动即可。整体的运作流程如下，图片来自[Cobbler自动化安装配置实践](https://wsgzao.github.io/post/cobbler/):
 
-![cobbler-process](http://oeptotikb.bkt.clouddn.com/2017-06-25-cobbler-process.jpeg)
+![cobbler-process](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-25-cobbler-process.jpeg)
 
 ## Cobbler 实践
 

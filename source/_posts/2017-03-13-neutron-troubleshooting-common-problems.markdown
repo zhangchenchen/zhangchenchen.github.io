@@ -37,18 +37,18 @@ tags:
 
 在neutron 中，有一个agent叫做 DHCP agent，它通过 RPC 跟 neutron-server 通信，它会为每一个 network 创建一个dhcp namaspace，以实现网络的隔离。在这个namespace里，有一个dnsmasq的进程，它是真正实现分配IP 的服务。
 
-![vm-get-ip](http://oeptotikb.bkt.clouddn.com/2017-03-13-vm_get_ip.png)
+![vm-get-ip](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-vm_get_ip.png)
 
 关于这部分的具体代码分析，可以参考[Neutron 理解（5）：Neutron 是如何向 Nova 虚机分配固定IP地址的 （How Neutron Allocates Fixed IPs to Nova Instance）](http://www.cnblogs.com/sammyliu/p/4419195.html)
 接下来我们看下packets 的flow流向，以便更精准的定位问题,因为二层网络的实现方式不一样——————openvswitch方式和Linux bridge方式，所以流向也不尽相同，先看下ovs的流向。
 
-![ovs-get-ip](http://oeptotikb.bkt.clouddn.com/2017-03-13-openvswitch_flow.png)
+![ovs-get-ip](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-openvswitch_flow.png)
 
 流程图一目了然，原文其实做了很多解释，这里就不多说了，如果不清楚的可以参看原文，或者看我之前的一篇[openstack-- neutron 二/三层网络实现探究](https://zhangchenchen.github.io/2017/02/12/neutron-layer2-3-realization-discovry/)
 
 同样，linux bridge实现的二层网络，流向如下：
 
-![bridge-get-ip](http://oeptotikb.bkt.clouddn.com/2017-03-13-linux_bridge_flow.png)
+![bridge-get-ip](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-linux_bridge_flow.png)
 
 ok,接下来开始debug:
 
@@ -56,7 +56,7 @@ ok,接下来开始debug:
 - 确定虚拟机是running 的，接下来就要进行网络的分析，首先需要确定两件事：一是物理网络是没问题的，二是虚拟机的security group是允许ping/ssh的。
 - 接下来查看port绑定是否成功，分为在虚拟机上的port绑定和在DHCP/router上的绑定。一般来说虚拟机上的port绑定是比较容易被发现的，因为在boot虚拟机的过程中一旦绑定不成功就会报错。而在DHCP/router上的绑定，因为是异步过程所以不容易被发现（当创建一个port的时候即使最终port binding失败，但是也会返回创建成功）。这就需要我们使用 neutron port-show  PORT_ID 查看对应port是否绑定成功，不成功的话会如下图所示：
 
-![bonding-failure](http://oeptotikb.bkt.clouddn.com/2017-03-13-binding_failure.png)
+![bonding-failure](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-binding_failure.png)
 
    一般来说，port绑定不成功的话有两个原因：第一个原因是OVS agent 挂掉了，可以使用 neutron agent-list查看，OVS agent挂掉的另一个显著特征是 ovs-vsctl show | grep tap -A 3 发现br-int网桥的tap设备没有vlan tag. 第二个原因就是neutron agent 或者neutron server配置错误。
 
@@ -71,11 +71,11 @@ ok,接下来开始debug:
 
 还是看下包流向，因为2层网络的实现方式不同，流向也不尽相同。首先看下ovs方式的流向：
 
-![ovs-flow](http://oeptotikb.bkt.clouddn.com/2017-03-13-l3_external_flow.png)
+![ovs-flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-l3_external_flow.png)
 
 再看下linux bridge的方式，图示为从外部网络ping 虚拟机floating ip过程。
 
-![bridge-extenal-flow](http://oeptotikb.bkt.clouddn.com/2017-03-13-l3_external_linux_bridge_flow.png)
+![bridge-extenal-flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-l3_external_linux_bridge_flow.png)
 
 debug步骤如下：
 
@@ -93,13 +93,13 @@ debug步骤如下：
 
 首先看下通过路由器路由的work-flow:
 
-![router-work-flow](http://oeptotikb.bkt.clouddn.com/2017-03-13-routed_networks_metadata.png)
+![router-work-flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13-routed_networks_metadata.png)
 
 注意：metdata proxy 是由l3-agent实现，它会在指定端口监听（默认 9697），接收到request后，会增加虚拟机ip,router id到request header并转发到metadata agent。
 
 再看下没有路由器直连（isolated-network）的情况:
 
-![isolated-net](http://oeptotikb.bkt.clouddn.com/2017-03-13isolated_network_metadata.png)
+![isolated-net](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13isolated_network_metadata.png)
 
 注意：要想开启这一功能，需要在dhcp-agent配置文件中设置：   
 enable_isolated_metadata = True.
@@ -121,7 +121,7 @@ enable_isolated_metadata = True.
 
 workflow如下：
 
-![vif-plugging](http://oeptotikb.bkt.clouddn.com/2017-03-13vif_plugging.png)
+![vif-plugging](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-13vif_plugging.png)
 
 当nova 发出allocate_network 请求时，会设置一个默认5分钟的等待时间，如果5分钟过后还没有收到neutron 回复，就会报 VIF plugging timeout 这个错误。
 

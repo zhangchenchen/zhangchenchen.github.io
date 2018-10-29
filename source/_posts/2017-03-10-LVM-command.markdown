@@ -36,41 +36,41 @@ LVM的基本组成块如下：
 
 首先，确认磁盘使用lvm以及确定磁盘大小：
 
-![lvm-1](http://oeptotikb.bkt.clouddn.com/2017-030-10-lvm-1.png)
+![lvm-1](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-030-10-lvm-1.png)
 
 可以看到磁盘/dev/sda大小总共约为53G，/dev/sda2是已经加入卷组的一个物理卷。
 
-![lvm-2](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-2.png)
+![lvm-2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-2.png)
 
 /dev/mapper/cl-root 与/dev/mapper/cl-swap 设备其实是逻辑卷。
-![lvm-3](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-3.png)
+![lvm-3](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-3.png)
 
 
 接下来在workstation面板进行磁盘扩展：
 
-![lvm-4](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-4.png)
+![lvm-4](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-4.png)
 
 查看磁盘情况：
 
-![lvm-5](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-df.png)
+![lvm-5](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-df.png)
 
 可以看到磁盘已经扩展为60G+了，但是磁盘分区还是两个且大小没变，而且挂载root的/dev/mapper/cl-root依然是50G,所以接下来我们需要做的就是将多出来的10G空间进行磁盘分区并最终扩展到逻辑卷dev/mapper/cl-root。
 
 首先磁盘分区并将该分区设置为LVM格式。
 
-![lvm-6](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-6.png)
+![lvm-6](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-6.png)
 
 重启机器（或者不重启，执行 partprobe 命令让内核更新分区表），将/dev/sda3创建物理卷，并将该物理卷加入卷组。
 
-![lvm-7](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-7.png)
+![lvm-7](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-7.png)
 
 扩展逻辑卷并将对应的文件系统扩展，如果是ext3/4文件系统用resize2fs 命令。
 
-![lvm-8](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-8.png)
+![lvm-8](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-8.png)
 
 扩展成功。
 
-![lvm-9](http://oeptotikb.bkt.clouddn.com/2017-03-10-lvm-9.png)
+![lvm-9](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-10-lvm-9.png)
 
 
 

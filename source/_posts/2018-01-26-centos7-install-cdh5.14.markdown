@@ -146,7 +146,7 @@ mysql> grant all on database.* TO 'user'@'%' IDENTIFIED BY 'password';
 Query OK, 0 rows affected (0.00 sec)
 ```
 数据库的名字，用户名等可以参考除了以下列出的，还需创建oozie的数据库以及用户名密码.
-![mysql](http://oeptotikb.bkt.clouddn.com/20180129200028-mysql-role.jpg)
+![mysql](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180129200028-mysql-role.jpg)
 
 ### Cloudera Manager 安装
 

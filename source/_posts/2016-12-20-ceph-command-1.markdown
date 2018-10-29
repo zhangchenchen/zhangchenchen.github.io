@@ -37,7 +37,7 @@ tags: ceph
  
 ceph 数据的组织方式是在物理资源的基础上进行了多层映射。
 
-![ceph data organize](http://oeptotikb.bkt.clouddn.com/2016-12-20-ceph-data-organize.png)
+![ceph data organize](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-20-ceph-data-organize.png)
 
 客户想要创建一个rbd设备前，必须创建 一个pool，需要为这个pool指定pg的数量，在一个pool中的pg数量是不一定的，同时这个pool中要指明保存数据的副本数量3个副本。再在这个pool中创建一个rbd设备rbd0，那么这个rbd0都会保存三份，在创建rbd0时必须指定rbd的size，对于这个rbd0的任何操作不能超过这个size。之后会将这个块设备进行切块，每个块的大小默认为4M，并且每个块都有一个名字，名字就是object+序号。将每个object通过pg进行副本位置的分配，pg会寻找3个osd，把这个object分别保存在这三个osd上。osd上实际是把底层的disk进行了格式化操作，一般部署工具会将它格式化为xfs文件系统。最后对于object的存储就变成了存储一个文件rbd0.object1.file。
 
@@ -52,7 +52,7 @@ ceph 数据的组织方式是在物理资源的基础上进行了多层映射。
 
 假设这次采用的是librbd的形式，使用librbd创建一个块设备，这时向这个块设备中写入数据，在客户端本地同过调用librados接口，然后经过pool，rbd，object、pg进行层层映射,在PG这一层中，可以知道数据保存在哪3个OSD上，这3个OSD分为主从的关系，也就是一个primary OSD，两个replica OSD。客户端与primay OSD建立SOCKET 通信，将要写入的数据传给primary OSD，由primary OSD再将数据发送给其他replica OSD数据节点。
 
-![ceph-data-write](http://oeptotikb.bkt.clouddn.com/2016-12-20-ceph-data-write.png)
+![ceph-data-write](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-20-ceph-data-write.png)
 
 <a name="B"></a>
 

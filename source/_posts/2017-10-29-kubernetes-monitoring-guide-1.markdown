@@ -34,7 +34,7 @@ InfluxDB是基于LevelDB ，为了优化写请求比较多的情况而实现的�
 
 如下图，便是kubernetes监控的总体架构图：
 
-![k8s-monitor-arc](http://oeptotikb.bkt.clouddn.com/2017-10-31-monitoring-architecture.png)
+![k8s-monitor-arc](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-10-31-monitoring-architecture.png)
 
 
 
@@ -118,7 +118,7 @@ spec:
 
 这三个服务都有对应的restAPI可以调用，执行kubectl cluster-info 可以获取对应的地址。
 
-![cluster-info](http://oeptotikb.bkt.clouddn.com/2017-10-31-cluster-info.jpg)
+![cluster-info](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-10-31-cluster-info.jpg)
 
 可以看出都是走的api-server的端口，应该是api-server调的这三个服务。
 
@@ -180,7 +180,7 @@ curl http://172.16.21.250:6444/api/v1/proxy/namespaces/kube-system/services/heap
 
 Grafana也提供rest api，url 的构建同上，可以参考[HTTP API Reference](http://docs.grafana.org/http_api/)。除此之外，grafana还有一个UI可以访问，在Grafana的yaml文件中添加type：NodePort,然后就可以通过ip:NodePort访问该UI。
 
-![grafana-ui](http://oeptotikb.bkt.clouddn.com/grafana-20171101154016.jpg)
+![grafana-ui](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/grafana-20171101154016.jpg)
 
 通过该UI界面，设置查询SQL，就可以定制自己需要的图表，参考[How to Utilize the “Heapster + InfluxDB + Grafana” Stack in Kubernetes for Monitoring Pods](https://blog.kublr.com/how-to-utilize-the-heapster-influxdb-grafana-stack-in-kubernetes-for-monitoring-pods-4a553f4d36c9)
 

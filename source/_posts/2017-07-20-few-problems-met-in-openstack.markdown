@@ -59,7 +59,7 @@ kvm -m 2048 -smp 4,sockets=2,cores=1,threads=2 -drive file=win7_x64_pure
 
 创建虚拟机的时候报如标题所述错误，查看详细日志，可以看出是Virtual Interface creation failed.
 
-![virtual-interface-fail](http://oeptotikb.bkt.clouddn.com/2017-08-09-CREATIO-INTERFACE-FAIL.png)
+![virtual-interface-fail](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-09-CREATIO-INTERFACE-FAIL.png)
 
 自然想到可能是Virtual Interface 创建失败导致创建虚拟机失败，查看neutron-server日志，发现如下信息：
 ```bash

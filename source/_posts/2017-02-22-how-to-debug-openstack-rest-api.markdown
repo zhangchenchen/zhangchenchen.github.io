@@ -100,11 +100,11 @@ v2版本对用户的权限管理以每一个用户为单位，需要对每一个
 
 在使用postman调试之前，先列出openstack 中常用组件默认监听的端口：
 
-![default-port](http://oeptotikb.bkt.clouddn.com/2017-02-22-openstack-default-port.png)
+![default-port](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-02-22-openstack-default-port.png)
 
 其他服务组件的默认监听端口：
 
-![other-default-port](http://oeptotikb.bkt.clouddn.com/2017-02-22-openstack-extend-default-port.png)
+![other-default-port](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-02-22-openstack-extend-default-port.png)
 
 
 ### 使用 postman 调试 openstack rest api
@@ -114,11 +114,11 @@ v2版本对用户的权限管理以每一个用户为单位，需要对每一个
 - 向 keystone 发送post请求获取 token 以及 service endpoint:
 
     request headers 内容如下：
-![headers](http://oeptotikb.bkt.clouddn.com/2.png)
+![headers](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2.png)
 
     request body 内容如下：
 
-![body](http://oeptotikb.bkt.clouddn.com/2017-02-22-header-body.png) 
+![body](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-02-22-header-body.png) 
     返回结果如下：
 
  ```json
@@ -172,7 +172,7 @@ v2版本对用户的权限管理以每一个用户为单位，需要对每一个
 
 - 向 nova 发送 获取虚拟机列表的rest 请求，将上一步获取到的 token id填入 X-Auth-Token中。
 
- ![nova-rest](http://oeptotikb.bkt.clouddn.com/2017-02-22nova-auth.png)
+ ![nova-rest](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-02-22nova-auth.png)
 
    发送该请求即可得到我们的结果：
 

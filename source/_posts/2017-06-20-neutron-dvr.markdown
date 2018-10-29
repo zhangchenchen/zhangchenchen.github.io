@@ -37,11 +37,11 @@ neutron 的DVR 是属于openstack HA的一部分，主要解决虚拟路由器�
 
 在没有使用dvr时，我们的整体架构大致是这样的：
 
-![neutron-arc1](http://oeptotikb.bkt.clouddn.com/neutron-arc-1.png)
+![neutron-arc1](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/neutron-arc-1.png)
 
 计算节点只需要安装L2 Agent就可以，而使用dvr模式后：
 
-![neutron-arc-2](http://oeptotikb.bkt.clouddn.com/2017-06-20neutro-arc-2.png)
+![neutron-arc-2](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-06-20neutro-arc-2.png)
 
 计算节点除了L2 Agent外，还要安装L3 Agent以及Metadata Agent。也就是说，通过使用dvr，计算节点也有了网络节点的三层转发和NAT功能，起到了分流的作用。
 

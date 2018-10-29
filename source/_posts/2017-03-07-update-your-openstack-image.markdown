@@ -208,7 +208,7 @@ $ guestfish --rw -a centos63.raw  # 进入guestfish shell ,Mount the image in re
 ```
 进入之后 ，先执行run ，会创建一个虚拟机实例。
 
-![libguestfs](http://oeptotikb.bkt.clouddn.com/2017-03-24-libguestfs.png)
+![libguestfs](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-03-24-libguestfs.png)
 
 如果出现错误的话，可以 export LIBGUESTFS_DEBUG=1 打开debug模式查找错误。或者利用 libguestfs-test-tool 命令测试一下。
 接下来示例编辑网卡配置：

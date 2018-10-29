@@ -36,7 +36,7 @@ Harbor共有五个组件，分别如下：
 
 架构图如下：
 
-![harbor-arch](http://oeptotikb.bkt.clouddn.com/2017-08-03.harbor-arc.jpg)
+![harbor-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-03.harbor-arc.jpg)
 
 这五个容器之间通过docker-link相连，即通过容器名字互相访问，暴露Proxy服务的端口给终端用户访问。
 
@@ -45,7 +45,7 @@ Harbor共有五个组件，分别如下：
 以docker login 与 docker push为例讲解：
 
 客户端 输入docker login 之后，流程如下图：
-![docker-login-flow](http://oeptotikb.bkt.clouddn.com/2017-08-03-harbor-flow1.jpg)
+![docker-login-flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-03-harbor-flow1.jpg)
 
 (a) 首先，这个登录请求会被Proxy容器接收到，根据预先设置的匹配规则，该请求会被转发给后端Registry容器。
 (b) Registry接收到请求后，解析请求，因为配置了基于token的认证，所以会查找token，发现请求没有token 后，返回错误代码401以及token服务的地址URL。
@@ -55,7 +55,7 @@ Harbor共有五个组件，分别如下：
 
 客户端 登陆成功后，输入docker push xxxxxx 之后，流程如下图（便于说明省略Docker client与Proxy之间通信）：
 
-![docker-push-flow](http://oeptotikb.bkt.clouddn.com/2017-08-03-harbor-flow-2.jpg)
+![docker-push-flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-03-harbor-flow-2.jpg)
 
 (a) 同样，首先与Registery通信，返回一个token服务的地址URL.
 (b) Docker客户端会与token服务通信，指明要申请一个push image操作的token。

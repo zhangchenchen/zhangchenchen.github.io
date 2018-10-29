@@ -47,11 +47,11 @@ RabbitMQ：跨三个节点部署 RabbitMQ 集群和镜像消息队列。可以�
 - HAProxy：向 API，RabbitMQ 和 MariaDB 多活服务提供负载均衡，其自身由 Pacemaker 实现 A/P HA，提供 VIP，某一时刻只由一个HAProxy提供服务。在部署中，也可以部署单独的 HAProxy 集群。
 - Memcached：它原生支持 A/A，只需要在 OpenStack 中配置它所有节点的名称即可，比如，memcached_servers = controller1:11211,controller2:11211。当 controller1:11211 失效时，OpenStack 组件会自动使用controller2:11211。
 
-![openstack-con-ha](http://oeptotikb.bkt.clouddn.com/2017-04-21-openstack-con-ha.jpg)
+![openstack-con-ha](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-21-openstack-con-ha.jpg)
 
 从一个请求的角度大致时序如下：
 
-![flow](http://oeptotikb.bkt.clouddn.com/2017-04-21-flow.jpg)
+![flow](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-21-flow.jpg)
 
 这里在重点说一下rabbitmq 与mysql用的HA方案：
 
@@ -88,7 +88,7 @@ mysql 的HA 方案有很多，这里只讨论openstack 官方推荐的mariadb ga
 
 openstack doc 中提到在用HAproxy做galara cluster 的负载均衡时，因为该集群不支持跨节点对表加锁，也就是说如果OpenStack 某组件有两个会话分布在两个节点上同时写入某一条数据，会出现其中一个会话遇到死锁的情况。可以参考[Understanding reservations, concurrency, and locking in Nova](http://www.joinfu.com/2015/01/understanding-reservations-concurrency-locking-in-nova/),讲解的比较清晰。
 
-![galera-lock](http://oeptotikb.bkt.clouddn.com/2017-04-15galera-update-certification-timeout.png)
+![galera-lock](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-15galera-update-certification-timeout.png)
 
 解决方案上文作者就提出了一种方式，楼主看了下最新版代码已经没有with_lockmode('update') 语句。
 
@@ -99,7 +99,7 @@ openstack doc 中提到在用HAproxy做galara cluster 的负载均衡时，因�
 
 这里说的网络控制节点是为了方便描述，并不是neutron的所有服务都在该节点，看下图，
 
-![network-controller-node](http://oeptotikb.bkt.clouddn.com/2017-04-15-net-con.jpg)
+![network-controller-node](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-04-15-net-con.jpg)
 
 可以认为neutron-service在控制节点，L3 agent,DHCP agent, Metadata agent,L2 agent等所在节点为网络控制节点，接下来就是针对具体的服务讨论HA 的方案，通常来说，我们只需考虑L3 agent,DHCP agent 这两个服务的HA即可，L2 agent只在所在的网络或者计算节点上提供服务，不需要HA。neutron-metadata-agent需要和 neutron-ns-metadata-proxy 通过soket 通信，可以在所有 neutron network 节点上都运行该 agent，只有 virtual router 所在的L3 Agent 上的 neutron-metadata-agent 才起作用，别的都standby。
 

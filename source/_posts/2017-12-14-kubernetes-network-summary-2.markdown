@@ -24,7 +24,7 @@ flannel 旨在解决不同host上的容器网络互联问题，大致原理是�
 
 找了一张有容云博客中的图：
 
-![flannel](http://oeptotikb.bkt.clouddn.com/20171212140335-flannel.jpg)
+![flannel](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171212140335-flannel.jpg)
 
 图中backend是用udp作为示例，我们可以换成其他任意两种，原理类似。
 
@@ -57,7 +57,7 @@ Calico基于iptables还提供了丰富而灵活的网络Policy，保证通过各
 对于有IP限制的host，也可以使用calico的IPIP方案（overlay方式）。
 
 calico 的架构：
-![calico-arch](http://oeptotikb.bkt.clouddn.com/20171212-calico-arch.jpg)
+![calico-arch](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171212-calico-arch.jpg)
 
 具体通信流程可以结合实践，参考[如何部署 Calico 网络？- 每天5分钟玩转 Docker 容器技术（67）](http://www.cnblogs.com/CloudMan6/p/7509975.html)
 

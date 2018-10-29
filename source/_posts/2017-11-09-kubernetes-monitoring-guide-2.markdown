@@ -953,9 +953,9 @@ spec:
 
 我司容器云平台后端存储使用的ceph,花了一点时间将ceph的监控转到prometheus上，并找了一个不错的grafana模板，最终效果（实验环境）如下：
 
-![grafana-cepg-cluster](http://oeptotikb.bkt.clouddn.com/20171123-grafana-ceph-cluster.jpg)
+![grafana-cepg-cluster](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171123-grafana-ceph-cluster.jpg)
 
-![grafana-ceph-osd](http://oeptotikb.bkt.clouddn.com/20171123-ceph-osd.jpg)
+![grafana-ceph-osd](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171123-ceph-osd.jpg)
 
 简单叙述下具体过程：
 
@@ -1019,7 +1019,7 @@ spec:
 
 部署完成后，到prometheus 的target页面查看是否能被prometheus 抓取。
 
-![prometheus-target](http://oeptotikb.bkt.clouddn.com/20171123-ceph-prometheus.jpg)
+![prometheus-target](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20171123-ceph-prometheus.jpg)
 
 
 ### 导入 grafana 模板

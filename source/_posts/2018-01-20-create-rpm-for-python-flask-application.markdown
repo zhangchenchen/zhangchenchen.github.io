@@ -37,7 +37,7 @@ $ vim ~/.rpmmacros    # 修改工作目录
 $ mkdir -pv ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS} 
 ```
 简单介绍下工作目录中的几个目录的作用：
-![rpm-dir](http://oeptotikb.bkt.clouddn.com/20180120rpm-dir.jpg)
+![rpm-dir](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20180120rpm-dir.jpg)
 
 - 准备源码文件，主要包括三个文件，一个是Flask源码文件全部打包压缩成一个tar.gz包，还有两个启动文件。将这三个文件放到SOURCES目录。启动文件示例如下：
 ```bash
@@ -119,7 +119,7 @@ exit $?
 ```
 - 编写SPEC文件，SPEC文件有几个部分组成，也代表着rpm打包时的几个步骤。先看下rpm打包的四个步骤：
 
-![rpm-build-step](http://oeptotikb.bkt.clouddn.com/rpmbulld-step-20180122133542.jpg)
+![rpm-build-step](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/rpmbulld-step-20180122133542.jpg)
 对应的SPEC文件示例如下：
 ```bash
 # 第一部分：自定义的变量，通常是包名，版本等信息

@@ -29,7 +29,7 @@ tags: openstack
 
 - glance api 的版本目前如下：
 
- ![glance-api-version](http://oeptotikb.bkt.clouddn.com/20161214-glance-api-version.png)
+ ![glance-api-version](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/20161214-glance-api-version.png)
 
   v1版本逐渐弃用，目前v2版本用的比较多，v3版本正在开发中。v1与v2版的区别还是比较大的，不只是添加了很多API。v1版本中glance-api与glance-registry都是一个WSGI server,glance-api负责接收用户的restful请求，如果该请求是与metedata相关的，则将其转发给glance-registry，glance-registry会解析请求并与数据库交互，如果该请求是与image自身存取相关的，则直接转发给store backend。V2版本中，glance-registry服务的内容被整合进了glance-api中，采用责任链的模式实现API的处理流程。在下面结合实例分析的时候会更清晰。
   以下示例图来自网上，正确性不保证：

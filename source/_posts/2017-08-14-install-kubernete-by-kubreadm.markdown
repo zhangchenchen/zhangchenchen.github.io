@@ -376,7 +376,7 @@ kubectl create -f ./*
 该过程会pull相关镜像，同样，可以先翻墙pull下来再push到私有镜像仓库再使用。
 最终完成后，所有pods都running,可以看到dashboard的界面多了仪表盘。
 
-![dashboard](http://oeptotikb.bkt.clouddn.com/2017-08-16-dashboard.png)
+![dashboard](https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-16-dashboard.png)
 
 
 ## 参考文章
