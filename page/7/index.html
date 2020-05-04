@@ -271,6 +271,164 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2016/12/30/python-decorator/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="pekingzcc">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Solar">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Solar" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/12/30/python-decorator/" itemprop="url">
+                  python系列--python decorator 简 记
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-30T14:00:25+08:00">
+                2016-12-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/12/30/python-decorator/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/12/30/python-decorator/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="目录结构："><a href="#目录结构：" class="headerlink" title="目录结构："></a>目录结构：</h2><p><a href="#A">装饰器的本质</a></p>
+<p><a href="#B">装饰器的几种形式</a></p>
+<p>注：以下内容皆出自 酷壳 <a href="http://coolshell.cn/articles/11265.html" target="_blank" rel="noopener">PYTHON修饰器的函数式编程</a> ,本文只是便于自己记忆，做的一篇简单记录。</p>
+<p><a name="A"></a></p>
+<h2 id="装饰器的本质"><a href="#装饰器的本质" class="headerlink" title="装饰器的本质"></a>装饰器的本质</h2><p>看下一个最简单的装饰器的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line"> </span><br><span class="line">foo()</span><br></pre></td></tr></table></figure>
+<p>@注解 是一个Python 中的语法糖，比如一个如下语句<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@decorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
+<p>它会被解释为 ：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">func = decorator(func)</span><br></pre></td></tr></table></figure></p>
+<p>其实就是把一个函数当作参数传到另一个函数，然后再回调，最后再把decorator这个函数的返回值赋值回了原来的func。</p>
+<p>落实到刚开始的例子就是：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line"></span><br><span class="line">foo = hello(foo)</span><br><span class="line"></span><br><span class="line">foo()</span><br></pre></td></tr></table></figure></p>
+<p>OK,这样就理清了！</p>
+<p><a name="B"></a></p>
+<h2 id="装饰器的几种形式"><a href="#装饰器的几种形式" class="headerlink" title="装饰器的几种形式"></a>装饰器的几种形式</h2><ul>
+<li>带参数的形式：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">makeHtmlTag</span><span class="params">(tag, *args, **kwds)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">real_decorator</span><span class="params">(fn)</span>:</span></span><br><span class="line">        css_class = <span class="string">" class='&#123;0&#125;'"</span>.format(kwds[<span class="string">"css_class"</span>]) \</span><br><span class="line">                                     <span class="keyword">if</span> <span class="string">"css_class"</span> <span class="keyword">in</span> kwds <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapped</span><span class="params">(*args, **kwds)</span>:</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;"</span>+tag+css_class+<span class="string">"&gt;"</span> + fn(*args, **kwds) + <span class="string">"&lt;/"</span>+tag+<span class="string">"&gt;"</span></span><br><span class="line">        <span class="keyword">return</span> wrapped</span><br><span class="line">    <span class="keyword">return</span> real_decorator</span><br><span class="line"> </span><br><span class="line"><span class="meta">@makeHtmlTag(tag="b", css_class="bold_css")</span></span><br><span class="line"><span class="meta">@makeHtmlTag(tag="i", css_class="italic_css")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"hello world"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> hello()</span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># &lt;b class='bold_css'&gt;&lt;i class='italic_css'&gt;hello world&lt;/i&gt;&lt;/b&gt;</span></span><br></pre></td></tr></table></figure>
+<p>为了让 hello = makeHtmlTag(arg1, arg2)(hello) 成功，makeHtmlTag 必需返回一个decorator（这就是为什么我们在makeHtmlTag中加入了real_decorator()的原因），这样一来，我们就可以进入到 decorator 的逻辑中去了—— decorator得返回一个wrapper，wrapper里回调hello。</p>
+<ul>
+<li>类的形式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myDecorator</span><span class="params">(object)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, fn)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__init__()"</span></span><br><span class="line">        self.fn = fn</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__call__()"</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">@myDecorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aFunction</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"inside aFunction()"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> <span class="string">"Finished decorating aFunction()"</span></span><br><span class="line"> </span><br><span class="line">aFunction()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># inside myDecorator.__init__()</span></span><br><span class="line"><span class="comment"># Finished decorating aFunction()</span></span><br><span class="line"><span class="comment"># inside aFunction()</span></span><br><span class="line"><span class="comment"># inside myDecorator.__call__()</span></span><br></pre></td></tr></table></figure>
+<p>可以看出在构造装饰器装饰的函数时，执行<strong>init</strong>函数，在真正调用aFunction()函数时会调用<strong>call</strong>。</p>
+<p>看下重写上面的html.py的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">makeHtmlTagClass</span><span class="params">(object)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, tag, css_class=<span class="string">""</span>)</span>:</span></span><br><span class="line">        self._tag = tag</span><br><span class="line">        self._css_class = <span class="string">" class='&#123;0&#125;'"</span>.format(css_class) \</span><br><span class="line">                                       <span class="keyword">if</span> css_class !=<span class="string">""</span> <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, fn)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapped</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;"</span> + self._tag + self._css_class+<span class="string">"&gt;"</span>  \</span><br><span class="line">                       + fn(*args, **kwargs) + <span class="string">"&lt;/"</span> + self._tag + <span class="string">"&gt;"</span></span><br><span class="line">        <span class="keyword">return</span> wrapped</span><br><span class="line"> </span><br><span class="line"><span class="meta">@makeHtmlTagClass(tag="b", css_class="bold_css")</span></span><br><span class="line"><span class="meta">@makeHtmlTagClass(tag="i", css_class="italic_css")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(name)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hello, &#123;&#125;"</span>.format(name)</span><br></pre></td></tr></table></figure>
+<p>注意参数的调用，如果decorator有参数的话，<strong>init</strong>()成员就不能传入fn了，而fn是在<strong>call</strong>的时候传入的。</p>
+<p>被decorator的函数其实已经是另外一个函数了，对于最前面那个hello.py的例子来说，如果你查询一下foo.<strong>name</strong>的话，你会发现其输出的是“wrapper”，而不是我们期望的“foo”，这会给我们的程序埋一些坑。所以，Python的functool包中提供了一个叫wrap的decorator来消除这样的副作用。所以就有了下面这种形式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line"><span class="meta">    @wraps(fn)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''foo help doc'''</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"> </span><br><span class="line">foo()</span><br><span class="line"><span class="keyword">print</span> foo.__name__ <span class="comment">#输出 foo</span></span><br><span class="line"><span class="keyword">print</span> foo.__doc__  <span class="comment">#输出 foo help doc</span></span><br></pre></td></tr></table></figure>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://coolshell.cn/articles/11265.html" target="_blank" rel="noopener">PYTHON修饰器的函数式编程</a></p>
+<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
+<p> <strong><em>END</em></strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2016/12/26/AllInOne-openstack-environ/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1944,281 +2102,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2016/12/09/novaComputer-sourcecode-explain/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="pekingzcc">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Solar">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Solar" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/09/novaComputer-sourcecode-explain/" itemprop="url">
-                  openstack系列--novaCompute 源代码解读
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-09T08:56:25+08:00">
-                2016-12-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/09/novaComputer-sourcecode-explain/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/12/09/novaComputer-sourcecode-explain/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="目录结构："><a href="#目录结构：" class="headerlink" title="目录结构："></a>目录结构：</h2><p><a href="#A">novacompute 介绍</a></p>
-<p><a href="#B">以nova boot 为例解读代码 </a></p>
-<p><a href="#C">novacompute 整体讲解</a></p>
-<p><a name="A"></a></p>
-<h2 id="novacompute-介绍"><a href="#novacompute-介绍" class="headerlink" title="novacompute 介绍"></a>novacompute 介绍</h2><ul>
-<li>novacomputer 完成的主要任务是虚拟机的生命周期管理。</li>
-<li>目前支持的虚拟化包括libvirt (KVM, Xen, LXC and more), Hyper-V, VMware, XenServer </li>
-<li>因为版本不同，代码也可能不同，该版本为Openstack Liberty</li>
-</ul>
-<p><a name="B"></a></p>
-<h2 id="以nova-boot-为例解读代码"><a href="#以nova-boot-为例解读代码" class="headerlink" title="以nova boot 为例解读代码"></a>以nova boot 为例解读代码</h2><ul>
-<li>首先我们先把之前解读novaconductor时发送rpc消息给novacompute的代码拿过来nova/conductor/manager.py.ComputeTaskManager.build_instances：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#发送异步消息给nova-compute，完成instance的boot</span></span><br><span class="line">self.compute_rpcapi.build_and_run_instance(context,</span><br><span class="line">        instance=instance, host=host[<span class="string">'host'</span>], image=image,</span><br><span class="line">        request_spec=request_spec,</span><br><span class="line">        filter_properties=local_filter_props,</span><br><span class="line">        admin_password=admin_password,</span><br><span class="line">        injected_files=injected_files,</span><br><span class="line">        requested_networks=requested_networks,</span><br><span class="line">        security_groups=security_groups,</span><br><span class="line">        block_device_mapping=bdms, node=host[<span class="string">'nodename'</span>],</span><br><span class="line">        limits=host[<span class="string">'limits'</span>])</span><br></pre></td></tr></table></figure>
-<p>可以看到novaconductor 引入novacomputer中的rpcapi.py文件，调用ComputeAPI.build_and_run_instance方法，看下该方法：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_and_run_instance</span><span class="params">(self, ctxt, instance, host, image, request_spec,</span></span></span><br><span class="line"><span class="function"><span class="params">        filter_properties, admin_password=None, injected_files=None,</span></span></span><br><span class="line"><span class="function"><span class="params">        requested_networks=None, security_groups=None,</span></span></span><br><span class="line"><span class="function"><span class="params">        block_device_mapping=None, node=None, limits=None)</span>:</span></span><br><span class="line"></span><br><span class="line">    version = <span class="string">'4.0'</span></span><br><span class="line">    <span class="comment">#创建一个指定host的RPCClient</span></span><br><span class="line">    cctxt = self.router.by_host(ctxt, host).prepare(</span><br><span class="line">            server=host, version=version)</span><br><span class="line">    <span class="comment">#发送异步rpc请求</span></span><br><span class="line">    cctxt.cast(ctxt, <span class="string">'build_and_run_instance'</span>, instance=instance,</span><br><span class="line">            image=image, request_spec=request_spec,</span><br><span class="line">            filter_properties=filter_properties,</span><br><span class="line">            admin_password=admin_password,</span><br><span class="line">            injected_files=injected_files,</span><br><span class="line">            requested_networks=requested_networks,</span><br><span class="line">            security_groups=security_groups,</span><br><span class="line">            block_device_mapping=block_device_mapping, node=node,</span><br><span class="line">            limits=limits)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>由之前分析可知，rpc的请求被服务端接收后，真正执行函数的地方在manager.py这个文件里，找到执行函数：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@wrap_exception() #捕获所有exception的装饰器</span></span><br><span class="line"><span class="meta">@reverts_task_state #一旦build instance failure 会还原 task-state</span></span><br><span class="line"><span class="meta">@wrap_instance_fault #捕获所有instance相关的异常</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_and_run_instance</span><span class="params">(self, context, instance, image, request_spec,</span></span></span><br><span class="line"><span class="function"><span class="params">                 filter_properties, admin_password=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                 injected_files=None, requested_networks=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                 security_groups=None, block_device_mapping=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                 node=None, limits=None)</span>:</span></span><br><span class="line">    <span class="comment">#保证某一instance的任务是同步执行的</span></span><br><span class="line"><span class="meta">    @utils.synchronized(instance.uuid)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_locked_do_build_and_run_instance</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        <span class="comment"># NOTE(danms): We grab the semaphore with the instance uuid</span></span><br><span class="line">        <span class="comment"># locked because we could wait in line to build this instance</span></span><br><span class="line">        <span class="comment"># for a while and we want to make sure that nothing else tries</span></span><br><span class="line">        <span class="comment"># to do anything with this instance while we wait.</span></span><br><span class="line">        <span class="keyword">with</span> self._build_semaphore:</span><br><span class="line">            <span class="comment">#最终调用该函数</span></span><br><span class="line">            self._do_build_and_run_instance(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># NOTE(danms): We spawn here to return the RPC worker thread back to</span></span><br><span class="line">    <span class="comment"># the pool. Since what follows could take a really long time, we don't</span></span><br><span class="line">    <span class="comment"># want to tie up RPC workers.</span></span><br><span class="line">    <span class="comment">#利用eventlet新建一个线程执行_locked_do_build_and_run_instance函数</span></span><br><span class="line">    utils.spawn_n(_locked_do_build_and_run_instance,</span><br><span class="line">                  context, instance, image, request_spec,</span><br><span class="line">                  filter_properties, admin_password, injected_files,</span><br><span class="line">                  requested_networks, security_groups,</span><br><span class="line">                  block_device_mapping, node, limits)</span><br></pre></td></tr></table></figure>
-<p>看下最后执行的_do_build_and_run_instance函数：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@hooks.add_hook('build_instance')</span></span><br><span class="line"><span class="meta">@wrap_exception()</span></span><br><span class="line"><span class="meta">@reverts_task_state</span></span><br><span class="line"><span class="meta">@wrap_instance_event(prefix='compute')</span></span><br><span class="line"><span class="meta">@wrap_instance_fault</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_do_build_and_run_instance</span><span class="params">(self, context, instance, image,</span></span></span><br><span class="line"><span class="function"><span class="params">        request_spec, filter_properties, admin_password, injected_files,</span></span></span><br><span class="line"><span class="function"><span class="params">        requested_networks, security_groups, block_device_mapping,</span></span></span><br><span class="line"><span class="function"><span class="params">        node=None, limits=None)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        LOG.debug(<span class="string">'Starting instance...'</span>, instance=instance)</span><br><span class="line">        instance.vm_state = vm_states.BUILDING</span><br><span class="line">        instance.task_state = <span class="keyword">None</span></span><br><span class="line">        <span class="comment">#更新task_stat</span></span><br><span class="line">        instance.save(expected_task_state=</span><br><span class="line">                (task_states.SCHEDULING, <span class="keyword">None</span>))</span><br><span class="line">    <span class="keyword">except</span> exception.InstanceNotFound:</span><br><span class="line">        msg = <span class="string">'Instance disappeared before build.'</span></span><br><span class="line">        LOG.debug(msg, instance=instance)</span><br><span class="line">        <span class="keyword">return</span> build_results.FAILED</span><br><span class="line">    <span class="keyword">except</span> exception.UnexpectedTaskStateError <span class="keyword">as</span> e:</span><br><span class="line">        LOG.debug(e.format_message(), instance=instance)</span><br><span class="line">        <span class="keyword">return</span> build_results.FAILED</span><br><span class="line"></span><br><span class="line">    <span class="comment"># b64 decode the files to inject:</span></span><br><span class="line">    decoded_files = self._decode_files(injected_files)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> limits <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        limits = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> node <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        <span class="comment">#由具体实现的driver（如libvirtDriver）获取nodename,因为hypervisor不一样，有的hypervisor其实就一个node(如libvirt),而有的则是多个node.</span></span><br><span class="line">        node = self.driver.get_available_nodes(refresh=<span class="keyword">True</span>)[<span class="number">0</span>]</span><br><span class="line">        LOG.debug(<span class="string">'No node specified, defaulting to %s'</span>, node,</span><br><span class="line">                  instance=instance)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment">#设定一个时间检测，调用_build_and_run_instance</span></span><br><span class="line">        <span class="keyword">with</span> timeutils.StopWatch() <span class="keyword">as</span> timer:</span><br><span class="line">            self._build_and_run_instance(context, instance, image,</span><br><span class="line">                    decoded_files, admin_password, requested_networks,</span><br><span class="line">                    security_groups, block_device_mapping, node, limits,</span><br><span class="line">                    filter_properties)</span><br><span class="line">        LOG.info(_LI(<span class="string">'Took %0.2f seconds to build instance.'</span>),</span><br><span class="line">                 timer.elapsed(), instance=instance)</span><br><span class="line">        <span class="keyword">return</span> build_results.ACTIVE</span><br><span class="line">    <span class="keyword">except</span> exception.RescheduledException <span class="keyword">as</span> e:</span><br><span class="line">        retry = filter_properties.get(<span class="string">'retry'</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> retry:</span><br><span class="line">            <span class="comment"># no retry information, do not reschedule.</span></span><br><span class="line">            LOG.debug(<span class="string">"Retry info not present, will not reschedule"</span>,</span><br><span class="line">                instance=instance)</span><br><span class="line">            self._cleanup_allocated_networks(context, instance,</span><br><span class="line">                requested_networks)</span><br><span class="line">            compute_utils.add_instance_fault_from_exc(context,</span><br><span class="line">                    instance, e, sys.exc_info(),</span><br><span class="line">                    fault_message=e.kwargs[<span class="string">'reason'</span>])</span><br><span class="line">            self._nil_ou  t_instance_obj_host_and_node(instance)</span><br><span class="line">            self._set_instance_obj_error_state(context, instance,</span><br><span class="line">                                               clean_task_state=<span class="keyword">True</span>)</span><br><span class="line">            <span class="keyword">return</span> build_results.FAILED</span><br><span class="line">           ....................................</span><br></pre></td></tr></table></figure>
-<p>接着往下看self._build_and_run_instance函数：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_build_and_run_instance</span><span class="params">(self, context, instance, image, injected_files,</span></span></span><br><span class="line"><span class="function"><span class="params">            admin_password, requested_networks, security_groups,</span></span></span><br><span class="line"><span class="function"><span class="params">            block_device_mapping, node, limits, filter_properties)</span>:</span></span><br><span class="line">        <span class="comment">#image是一个包含镜像信息的字典，‘name’是镜像的名字</span></span><br><span class="line">        image_name = image.get(<span class="string">'name'</span>)</span><br><span class="line">        self._notify_about_instance_usage(context, instance, <span class="string">'create.start'</span>,</span><br><span class="line">                extra_usage_info=&#123;<span class="string">'image_name'</span>: image_name&#125;)</span><br><span class="line"></span><br><span class="line">        self._check_device_tagging(requested_networks, block_device_mapping)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># #获取/创建ResourceTracker实例，为后续的资源申请做准备（此处涉及的resource Tracker Claim机制后面后详细讲）</span></span><br><span class="line">            rt = self._get_resource_tracker(node)</span><br><span class="line">            <span class="keyword">with</span> rt.instance_claim(context, instance, limits):</span><br><span class="line">                <span class="comment"># NOTE(russellb) It's important that this validation be done</span></span><br><span class="line">                <span class="comment"># *after* the resource tracker instance claim, as that is where</span></span><br><span class="line">                <span class="comment"># the host is set on the instance.</span></span><br><span class="line">                <span class="comment">#group_policy包含两种affinity 和 anti-affinity，在创建server_group的时候指定。</span></span><br><span class="line">                <span class="comment">#创建虚拟机时指定server_group,会根据group_policy倾向于创建在同一台host或不同host</span></span><br><span class="line">                self._validate_instance_group_policy(context, instance,</span><br><span class="line">                        filter_properties)</span><br><span class="line">                image_meta = objects.ImageMeta.from_dict(image)</span><br><span class="line">                <span class="comment">#为云主机申请网络资源，完成块设备验证及映射</span></span><br><span class="line">                <span class="keyword">with</span> self._build_resources(context, instance,</span><br><span class="line">                        requested_networks, security_groups, image_meta,</span><br><span class="line">                        block_device_mapping) <span class="keyword">as</span> resources:</span><br><span class="line">                    instance.vm_state = vm_states.BUILDING</span><br><span class="line">                    instance.task_state = task_states.SPAWNING</span><br><span class="line">                    <span class="comment"># NOTE(JoshNang) This also saves the changes to the</span></span><br><span class="line">                    <span class="comment"># instance from _allocate_network_async, as they aren't</span></span><br><span class="line">                    <span class="comment"># saved in that function to prevent races.</span></span><br><span class="line">                    <span class="comment">#更新实例状态</span></span><br><span class="line">                    instance.save(expected_task_state=</span><br><span class="line">                            task_states.BLOCK_DEVICE_MAPPING)</span><br><span class="line">                    block_device_info = resources[<span class="string">'block_device_info'</span>]</span><br><span class="line">                    network_info = resources[<span class="string">'network_info'</span>]</span><br><span class="line">                    LOG.debug(<span class="string">'Start spawning the instance on the hypervisor.'</span>,</span><br><span class="line">                              instance=instance)</span><br><span class="line">                    <span class="keyword">with</span> timeutils.StopWatch() <span class="keyword">as</span> timer:</span><br><span class="line">                        <span class="comment">#调用hypervisor的spawn方法启动instance，如果使用libvirt的话，会调用nova/virt/libvirt/driver.py/libvirtDriver.spawn</span></span><br><span class="line">                        self.driver.spawn(context, instance, image_meta,</span><br><span class="line">                                          injected_files, admin_password,</span><br><span class="line">                                          network_info=network_info,</span><br><span class="line">                                          block_device_info=block_device_info)</span><br><span class="line">                    LOG.info(_LI(<span class="string">'Took %0.2f seconds to spawn the instance on '</span></span><br><span class="line">                                 <span class="string">'the hypervisor.'</span>), timer.elapsed(),</span><br><span class="line">                             instance=instance)</span><br><span class="line">        <span class="keyword">except</span> (exception.InstanceNotFound,</span><br><span class="line">                exception.UnexpectedDeletingTaskStateError) <span class="keyword">as</span> e:</span><br></pre></td></tr></table></figure>
-<ul>
-<li>看下nova/virt/libvirt/driver.py/libvirtDriver.spawn 方法：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">spawn</span><span class="params">(self, context, instance, image_meta, injected_files,</span></span></span><br><span class="line"><span class="function"><span class="params">              admin_password, network_info=None, block_device_info=None)</span>:</span></span><br><span class="line">        <span class="comment">#根据模拟器类型，获取块设备及光驱的总线类型</span></span><br><span class="line">        <span class="comment">#默认使用kvm，所以：块设备默认使用virtio；光驱默认使用ide；并且根据block_device_info设置设备映射</span></span><br><span class="line">        <span class="comment">#最后返回包含&#123;disk_bus,cdrom_bus,mapping&#125;的字典</span></span><br><span class="line">        disk_info = blockinfo.get_disk_info(CONF.libvirt.virt_type,</span><br><span class="line">                                            instance,</span><br><span class="line">                                            image_meta,</span><br><span class="line">                                            block_device_info)</span><br><span class="line">        gen_confdrive = functools.partial(self._create_configdrive,</span><br><span class="line">                                          context, instance,</span><br><span class="line">                                          admin_pass=admin_password,</span><br><span class="line">                                          files=injected_files,</span><br><span class="line">                                          network_info=network_info)</span><br><span class="line">        <span class="comment">#从glance下载镜像（如果本地_base目录没有的话），然后上传到后端存储</span></span><br><span class="line">        self._create_image(context, instance,</span><br><span class="line">                           disk_info[<span class="string">'mapping'</span>],</span><br><span class="line">                           network_info=network_info,</span><br><span class="line">                           block_device_info=block_device_info,</span><br><span class="line">                           files=injected_files,</span><br><span class="line">                           admin_pass=admin_password)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Required by Quobyte CI</span></span><br><span class="line">        self._ensure_console_log_for_instance(instance)</span><br><span class="line">        <span class="comment">#生成libvirt xml文件（libvirt创建虚拟机使用）</span></span><br><span class="line">        xml = self._get_guest_xml(context, instance, network_info,</span><br><span class="line">                                  disk_info, image_meta,</span><br><span class="line">                                  block_device_info=block_device_info)</span><br><span class="line">        <span class="comment">#调用libvirt启动实例</span></span><br><span class="line">        self._create_domain_and_network(</span><br><span class="line">            context, xml, instance, network_info, disk_info,</span><br><span class="line">            block_device_info=block_device_info,</span><br><span class="line">            post_xml_callback=gen_confdrive)</span><br><span class="line">        LOG.debug(<span class="string">"Instance is running"</span>, instance=instance)</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_wait_for_boot</span><span class="params">()</span>:</span></span><br><span class="line">            <span class="string">"""Called at an interval until the VM is running."""</span></span><br><span class="line">            state = self.get_info(instance).state</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> state == power_state.RUNNING:</span><br><span class="line">                LOG.info(_LI(<span class="string">"Instance spawned successfully."</span>),</span><br><span class="line">                         instance=instance)</span><br><span class="line">                <span class="keyword">raise</span> loopingcall.LoopingCallDone()</span><br><span class="line">        <span class="comment">#等待实例创建结果（通过libvirt获取云主机状态判断）</span></span><br><span class="line">        timer = loopingcall.FixedIntervalLoopingCall(_wait_for_boot)</span><br><span class="line">        timer.start(interval=<span class="number">0.5</span>).wait()</span><br></pre></td></tr></table></figure>
-<ul>
-<li>关于具体创建系统磁盘的代码_create_image，生成libvirt xml，调用libvirt启动实例的代码不再分析，可以参考这篇文章<a href="http://blog.csdn.net/lzw06061139/article/details/51505514" target="_blank" rel="noopener">check this</a>。</li>
-</ul>
-<p><a name="C"></a></p>
-<h2 id="novacompute-整体讲解"><a href="#novacompute-整体讲解" class="headerlink" title="novacompute 整体讲解"></a>novacompute 整体讲解</h2><ul>
-<li>novacomputer 代码目录如下：</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2016-12-09-nova-computer-code.png" alt="nova-computer-code"></p>
-<ul>
-<li>Resource Tracker:<br>nova-computer 会维护数据库中一个computer_nodes的表用来存储主机的资源使用情况，以便nova-scheduler获取作为选择主机的依据，这就要求每次创建，迁移，删除虚拟机时都要对数据库中的的computer_node进行更新。<br>nova-computer会为每一个主机创建一个ResourceTracker对象，更新computernode对象。<br>目前是有两种更新机制：一种是ResourceTracker的claim机制，一种是使用周期性任务（Periodic Task）<ol>
-<li>Claim机制：当一台主机被多个nova-scheduler同时选中并发出创建虚拟机的请求时，该主机并不一定有足够的资源满足创建要求。所以Claim机制就是在创建虚拟机之前先测试下是否满足新建需求，满足，则更新数据库，并将虚拟机申请的资源从主机可用的资源减掉，如果后来创建失败，或者虚拟机删除时，会通过claim加上之前减掉的部分。</li>
-</ol>
-</li>
-</ul>
-<pre><code class="python"><span class="meta">@utils.synchronized(COMPUTE_RESOURCE_SEMAPHORE)</span>
-<span class="function"><span class="keyword">def</span> <span class="title">instance_claim</span><span class="params">(self, context, instance, limits=None)</span>:</span>
-
-    <span class="keyword">if</span> self.disabled:
-        <span class="comment"># compute_driver doesn't support resource tracking, just</span>
-        <span class="comment"># set the 'host' and node fields and continue the build:</span>
-        self._set_instance_host_and_node(instance)
-        <span class="keyword">return</span> claims.NopClaim()
-
-    <span class="comment"># sanity checks:</span>
-    <span class="keyword">if</span> instance.host:
-        LOG.warning(_LW(<span class="string">"Host field should not be set on the instance "</span>
-                        <span class="string">"until resources have been claimed."</span>),
-                    instance=instance)
-
-    <span class="keyword">if</span> instance.node:
-        LOG.warning(_LW(<span class="string">"Node field should not be set on the instance "</span>
-                        <span class="string">"until resources have been claimed."</span>),
-                    instance=instance)
-    <span class="comment">#允许超配创建虚拟机</span>
-    <span class="comment"># get the overhead required to build this instance:</span>
-    overhead = self.driver.estimate_instance_overhead(instance)
-    LOG.debug(<span class="string">"Memory overhead for %(flavor)d MB instance; %(overhead)d "</span>
-              <span class="string">"MB"</span>, {<span class="string">'flavor'</span>: instance.flavor.memory_mb,
-                      <span class="string">'overhead'</span>: overhead[<span class="string">'memory_mb'</span>]})
-    LOG.debug(<span class="string">"Disk overhead for %(flavor)d GB instance; %(overhead)d "</span>
-              <span class="string">"GB"</span>, {<span class="string">'flavor'</span>: instance.flavor.root_gb,
-                     <span class="string">'overhead'</span>: overhead.get(<span class="string">'disk_gb'</span>, <span class="number">0</span>)})
-
-    pci_requests = objects.InstancePCIRequests.get_by_instance_uuid(
-        context, instance.uuid)
-    <span class="comment">#如果Claim返回none表示主机的资源满足不了新建虚拟机的需求，</span>
-    <span class="comment">#会调用__exit__()方法将占用的资源返还到主机可用资源中。</span>
-    claim = claims.Claim(context, instance, self, self.compute_node,
-                         pci_requests, overhead=overhead, limits=limits)
-
-    <span class="comment"># self._set_instance_host_and_node() will save instance to the DB</span>
-    <span class="comment"># so set instance.numa_topology first.  We need to make sure</span>
-    <span class="comment"># that numa_topology is saved while under COMPUTE_RESOURCE_SEMAPHORE</span>
-    <span class="comment"># so that the resource audit knows about any cpus we've pinned.</span>
-    instance_numa_topology = claim.claimed_numa_topology
-    instance.numa_topology = instance_numa_topology
-    <span class="comment">#通过Object model，若不在同一节点则调用ConductorAPI 更新instance的host,node等属性。</span>
-    self._set_instance_host_and_node(instance)
-
-    <span class="keyword">if</span> self.pci_tracker:
-        <span class="comment"># NOTE(jaypipes): ComputeNode.pci_device_pools is set below</span>
-        <span class="comment"># in _update_usage_from_instance().</span>
-        self.pci_tracker.claim_instance(context, pci_requests,
-                                        instance_numa_topology)
-
-    <span class="comment"># Mark resources in-use and update stats</span>
-    <span class="comment">#根据新建虚拟机的需求计算主机可用资源。</span>
-    self._update_usage_from_instance(context, instance)
-
-    elevated = context.elevated()
-    <span class="comment"># persist changes to the compute node:</span>
-    <span class="comment">#根据上面的计算结果更新数据库。</span>
-    self._update(elevated)
-
-    <span class="keyword">return</span> claim
-</code></pre>
-<ol start="2">
-<li>使用Periodic Task:在类nova.compute.manager.ComputeManager中有个周期性的任务update_available_resource()用于更新主机可用资源。顺便提一点，nova-compute在启动的时候会启动两个周期任务，一个用于更新主机可用资源update_available_resource，一个用于汇报本机nova-compute的服务状态给数据库（report state）。</li>
-</ol>
-<pre><code class="python"><span class="comment">#根据配置文件周期性的调用该函数。</span>
-<span class="comment">#该周期性的任务用于同步数据库内可用资源与hypervisor保持一致</span>
-<span class="meta">@periodic_task.periodic_task(spacing=CONF.update_resources_interval)</span>
-<span class="function"><span class="keyword">def</span> <span class="title">update_available_resource</span><span class="params">(self, context)</span>:</span>
-    <span class="string">"""See driver.get_available_resource()</span>
-<span class="string"></span>
-<span class="string">    Periodic process that keeps that the compute host's understanding of</span>
-<span class="string">    resource availability and usage in sync with the underlying hypervisor.</span>
-<span class="string"></span>
-<span class="string">    :param context: security context</span>
-<span class="string">    """</span>
-    compute_nodes_in_db = self._get_compute_nodes_in_db(context,
-                                                        use_slave=<span class="keyword">True</span>)
-    nodenames = set(self.driver.get_available_nodes())
-    <span class="comment">#更新所有主机数据库中的资源数据。</span>
-    <span class="keyword">for</span> nodename <span class="keyword">in</span> nodenames:
-        self.update_available_resource_for_node(context, nodename)
-
-    self._resource_tracker_dict = {
-        k: v <span class="keyword">for</span> k, v <span class="keyword">in</span> self._resource_tracker_dict.items()
-        <span class="keyword">if</span> k <span class="keyword">in</span> nodenames}
-
-    <span class="comment"># Delete orphan compute node not reported by driver but still in db</span>
-    <span class="comment">#清除inactive但仍在数据库中存有数据的计算节点信息</span>
-    <span class="keyword">for</span> cn <span class="keyword">in</span> compute_nodes_in_db:
-        <span class="keyword">if</span> cn.hypervisor_hostname <span class="keyword">not</span> <span class="keyword">in</span> nodenames:
-            LOG.info(_LI(<span class="string">"Deleting orphan compute node %s"</span>), cn.id)
-            cn.destroy()
-</code></pre>
-<ol start="3">
-<li><p>这两种机制并不冲突，一种是在新建或迁移虚拟机等涉及计算节点资源操作时，在当前数据库中数据的基础上更新，，保证数据库里的资源及时更新，以便为nova-scheduler 提供最新数据。周期性任务是保证hypervisor获取的资源数据与数据库中的数据保持一致。</p>
-</li>
-<li><p>关于resource tracker 如何更新数据库的代码分析<br> <a href="http://blog.csdn.net/gj19890923/article/details/50583435" target="_blank" rel="noopener">nova-compute Periodic tasks 机制</a></p>
-</li>
-</ol>
-<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://book.douban.com/subject/26374647/" target="_blank" rel="noopener">openstack 设计与实现</a></p>
-<p><a href="http://blog.csdn.net/lzw06061139/article/details/51505514" target="_blank" rel="noopener">Openstack liberty源码分析 之 云主机的启动过程3</a></p>
-<p><a href="http://blog.csdn.net/gj19890923/article/details/50583435" target="_blank" rel="noopener">nova-compute Periodic tasks 机制</a></p>
-<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
-<p> <strong><em>END</em></strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2266,7 +2149,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">101</span>
+                <span class="site-state-item-count">102</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2334,7 +2217,7 @@
         <div class="copyright" >
   
   &copy;  2016 - 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

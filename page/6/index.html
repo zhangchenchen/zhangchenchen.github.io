@@ -271,6 +271,175 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2017/02/17/openstack-instance-metadata-discovery/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="pekingzcc">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Solar">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Solar" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/17/openstack-instance-metadata-discovery/" itemprop="url">
+                  openstack-- openstack instance metadata 服务机制探索
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-17T17:54:25+08:00">
+                2017-02-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/17/openstack-instance-metadata-discovery/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/02/17/openstack-instance-metadata-discovery/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="引出"><a href="#引出" class="headerlink" title="引出"></a>引出</h2><p>在调试 cloud-init的时候发现在虚拟机内执行“ curl 169.254.169.254” 的时候出现“host not reachable”错误。在对 openstack instance（确切的说应该是server,因为还没有正式生成云主机） metadata 服务机制探索了一番之后，发现了错误所在，在分析该问题之前先记录下metadata 服务的原理，最后再记录下问题的解决过程。</p>
+<h2 id="openstack-instance-metadata-服务机制"><a href="#openstack-instance-metadata-服务机制" class="headerlink" title="openstack instance metadata 服务机制"></a>openstack instance metadata 服务机制</h2><p>广义上的metadata包含很多，不光 instance 有metadata属性，image,host,aggregate等都有。在openstack中，因为instance利用metadata 属性可以做很多事情，研究的价值更高一些，所以这里只讨论 instance 的metadata。(注：这里的metadata 服务 泛指 提供userdata &amp;&amp; metadata 的服务，因为userdata与metadata只是 内容以及 虚拟机获取之后处理方式不同，虚拟机获取方式是一样的)。关于 userdata 与 metadata，这里直接引用<a href="http://www.ibm.com/developerworks/cn/cloud/library/1509_liukg_openstackmeta/" target="_blank" rel="noopener">OpenStack 的 metadata 服务机制</a>中的一段：</p>
+<blockquote>
+<p>在创建虚拟机的时候，用户往往需要对虚拟机进行一些配置，比如：开启一些服务、安装某些包、添加 SSH 秘钥、配置 hostname 等等。在 OpenStack 中，这些配置信息被分成两类：metadata 和 user data。Metadata 主要包括虚拟机自身的一些常用属性，如 hostname、网络配置信息、SSH 登陆秘钥等，主要的形式为键值对。而 user data 主要包括一些命令、脚本等。User data 通过文件传递，并支持多种文件格式，包括 gzip 压缩文件、shell 脚本、cloud-init 配置文件等。这些信息被获取到后被cloudinit 利用并实现各自目的。虽然 metadata 和 user data 并不相同，但是 OpenStack 向虚拟机提供这两种信息的机制是一致的，只是虚拟机在获取到信息后，对两者的处理方式不同罢了</p>
+</blockquote>
+<p>openstack 中，虚拟机获取metadata 的信息有两种，即config drive 和 metadata restful 服务（即EC2方式）。下面分别记录下两种方式的原理：</p>
+<h3 id="config-drive-的方式"><a href="#config-drive-的方式" class="headerlink" title="config drive 的方式"></a>config drive 的方式</h3><p>所谓 config drive的方式就是将metadata信息写入虚拟机的一个特殊配置设备中，虚拟机启动的时候会挂载并读取metadata信息。要想实现这个功能，还需要宿主机和镜像满足一些条件：</p>
+<ol>
+<li>宿主机满足条件：<ul>
+<li>虚拟化方式为以下几种：libvirt,xen,hyper-v,vmware.</li>
+<li>对于 libvirt, xen, vmware的虚拟化方式，需要安装genisoimage.并且需要设置mkisofs为 程序的安装目录，如果是跟nova-compute安装在一个目录内就不用了。</li>
+<li>如果是 hyper-v的虚拟化方式，需要用mkisofs的命令行指定mkisofs.exe 程序的绝对安装路径，且在hyperv的配置文件中设置qemu_img_cmd 为qemu-img 的命令行安装路径。</li>
+</ul>
+</li>
+<li>镜像满足条件：<ul>
+<li>安装了cloud-init，且最好是0.7.1+ 的版本。如果是没有安装的话，就需要自己去定制脚本了。</li>
+<li>如果使用xen 虚拟化，需要配置 xenapi_disable_agent 为true。</li>
+</ul>
+</li>
+</ol>
+<p>在openstack中，在使用命令行创建虚拟机的时候指定 –config-drive true 即可使用config drive。如下实例（也可以用 nova command）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openstack server create --config-drive <span class="literal">true</span> --image my-image-name \</span><br><span class="line">  --flavor 1 --key-name mykey --user-data ./my-user-data.txt \</span><br><span class="line">  --file /etc/network/interfaces=/home/myuser/instance-interfaces \</span><br><span class="line">  --file known_hosts=/home/myuser/.ssh/known_hosts \</span><br><span class="line">  --property role=webservers --property essential=<span class="literal">false</span> MYINSTANCE</span><br></pre></td></tr></table></figure>
+<p>也可以在/etc/nova/nova.conf配置文件中指定 force_config_drive = true ，那么默认就使用config drive。</p>
+<p>如果镜像操作系统支持通过标签访问磁盘的话，可以使用如下命令查看config drive中的内容：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /mnt/config</span><br><span class="line">mount /dev/disk/by-label/config-2 /mnt/config</span><br><span class="line"><span class="built_in">cd</span> /mnt/config &amp; ls -l</span><br></pre></td></tr></table></figure></p>
+<p>进入该目录后，看到的内容大致如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ec2/2009-04-04/meta-data.json</span><br><span class="line">ec2/2009-04-04/user-data</span><br><span class="line">ec2/latest/meta-data.json</span><br><span class="line">ec2/latest/user-data</span><br><span class="line">openstack/2012-08-10/meta_data.json</span><br><span class="line">openstack/2012-08-10/user_data</span><br><span class="line">openstack/content</span><br><span class="line">openstack/content/0000</span><br><span class="line">openstack/content/0001</span><br><span class="line">openstack/latest/meta_data.json</span><br><span class="line">openstack/latest/user_data</span><br></pre></td></tr></table></figure></p>
+<p>可以看出，config drive支持 openstack以及EC2的方式获取数据，官方手册建议使用opensatck的方式（即读取opensatck目录里的内容），因为EC2的目录以后可能会弃用。而且最好使用最近的版本目录读取。</p>
+<h3 id="metadata-restful-服务的方式"><a href="#metadata-restful-服务的方式" class="headerlink" title="metadata restful 服务的方式"></a>metadata restful 服务的方式</h3><p>就是我们在虚拟机通过169.254.169.254的方式来获取metadata的方式。由以下三个组件来完成这项工作：</p>
+<ul>
+<li>Nova-api-metadata：运行在计算节点，启动restful服务，真正负责处理虚拟机发送来的rest 请求。从请求头中获取租户，虚拟机ID，再去数据库中查询相应的metadata信息并返回结果。</li>
+<li>Neutron-metadata-agent：运行在网络节点，负责将接收到的获取 metadata 的请求转发给 nova-api-metadata。</li>
+<li>Neutron-ns-metadata-proxy：由于虚拟机获取 metadata 的请求都是以路由和 DHCP 服务器作为网络出口，所以需要通过 neutron-ns-metadata-proxy 联通不同的网络命名空间，将请求在网络命名空间之间转发。</li>
+</ul>
+<p>流程大概如下：</p>
+<p><img src="http://www.ibm.com/developerworks/cn/cloud/library/1509_liukg_openstackmeta/index2894.png" alt="metadata"></p>
+<p>具体看下路由的过程，如果虚拟机所在的subnet连接在router上，该请求会先通过router来发送请求，如果没有router相连的话会通过对应dns 的网络空间进行传递，示例可以查看<a href="http://www.ibm.com/developerworks/cn/cloud/library/1509_liukg_openstackmeta/" target="_blank" rel="noopener">OpenStack 的 metadata 服务机制</a> 文章末。</p>
+<h2 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h2><p>了解了metadata rest的原理后，解决上述问题的思路就比较明确了，首先看下虚拟机确是使用restful 服务的方式而不是config drive的方式，从网络拓扑看，虚拟机所在的子网是连接着router的，但是查看虚拟机的路由表，却发现169.152.169.254发送到了dns的网络空间，而不是router的网络空间，然后再去查看对应dns的网络空间，发现并没有监听 80 端口的 neutron-ns-metadata-proxy 服务，而在router的网络空间却有对应的路由规则。<br>大致猜测虚拟机boot的时候没有发现对应子网有router相连，所以该虚拟机boot后会将169.152.169.254路由到对应dns，但其实该子网是有router相连的，所以neutron还是将监听的路由规则放到了router上。与router相关的服务就是neytron-l3-agent,重启该服务后，一切正常。</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://www.ibm.com/developerworks/cn/cloud/library/1509_liukg_openstackmeta/" target="_blank" rel="noopener">OpenStack 的 metadata 服务机制</a></p>
+<p><a href="https://docs.openstack.org/user-guide/cli-config-drive.html" target="_blank" rel="noopener">Store metadata on a configuration drive</a></p>
+<p><a href="https://docs.openstack.org/admin-guide/compute-networking-nova.html#metadata-service" target="_blank" rel="noopener">metadata-service</a></p>
+<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
+<p> <strong><em>END</em></strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2017/02/12/neutron-layer2-3-realization-discovry/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1900,164 +2069,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2016/12/30/python-decorator/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="pekingzcc">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Solar">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Solar" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/30/python-decorator/" itemprop="url">
-                  python系列--python decorator 简 记
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-30T14:00:25+08:00">
-                2016-12-30
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2016/12/30/python-decorator/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/12/30/python-decorator/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="目录结构："><a href="#目录结构：" class="headerlink" title="目录结构："></a>目录结构：</h2><p><a href="#A">装饰器的本质</a></p>
-<p><a href="#B">装饰器的几种形式</a></p>
-<p>注：以下内容皆出自 酷壳 <a href="http://coolshell.cn/articles/11265.html" target="_blank" rel="noopener">PYTHON修饰器的函数式编程</a> ,本文只是便于自己记忆，做的一篇简单记录。</p>
-<p><a name="A"></a></p>
-<h2 id="装饰器的本质"><a href="#装饰器的本质" class="headerlink" title="装饰器的本质"></a>装饰器的本质</h2><p>看下一个最简单的装饰器的例子：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line"> </span><br><span class="line">foo()</span><br></pre></td></tr></table></figure>
-<p>@注解 是一个Python 中的语法糖，比如一个如下语句<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@decorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure></p>
-<p>它会被解释为 ：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">func = decorator(func)</span><br></pre></td></tr></table></figure></p>
-<p>其实就是把一个函数当作参数传到另一个函数，然后再回调，最后再把decorator这个函数的返回值赋值回了原来的func。</p>
-<p>落实到刚开始的例子就是：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line"></span><br><span class="line">foo = hello(foo)</span><br><span class="line"></span><br><span class="line">foo()</span><br></pre></td></tr></table></figure></p>
-<p>OK,这样就理清了！</p>
-<p><a name="B"></a></p>
-<h2 id="装饰器的几种形式"><a href="#装饰器的几种形式" class="headerlink" title="装饰器的几种形式"></a>装饰器的几种形式</h2><ul>
-<li>带参数的形式：</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">makeHtmlTag</span><span class="params">(tag, *args, **kwds)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">real_decorator</span><span class="params">(fn)</span>:</span></span><br><span class="line">        css_class = <span class="string">" class='&#123;0&#125;'"</span>.format(kwds[<span class="string">"css_class"</span>]) \</span><br><span class="line">                                     <span class="keyword">if</span> <span class="string">"css_class"</span> <span class="keyword">in</span> kwds <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapped</span><span class="params">(*args, **kwds)</span>:</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;"</span>+tag+css_class+<span class="string">"&gt;"</span> + fn(*args, **kwds) + <span class="string">"&lt;/"</span>+tag+<span class="string">"&gt;"</span></span><br><span class="line">        <span class="keyword">return</span> wrapped</span><br><span class="line">    <span class="keyword">return</span> real_decorator</span><br><span class="line"> </span><br><span class="line"><span class="meta">@makeHtmlTag(tag="b", css_class="bold_css")</span></span><br><span class="line"><span class="meta">@makeHtmlTag(tag="i", css_class="italic_css")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"hello world"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> hello()</span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># &lt;b class='bold_css'&gt;&lt;i class='italic_css'&gt;hello world&lt;/i&gt;&lt;/b&gt;</span></span><br></pre></td></tr></table></figure>
-<p>为了让 hello = makeHtmlTag(arg1, arg2)(hello) 成功，makeHtmlTag 必需返回一个decorator（这就是为什么我们在makeHtmlTag中加入了real_decorator()的原因），这样一来，我们就可以进入到 decorator 的逻辑中去了—— decorator得返回一个wrapper，wrapper里回调hello。</p>
-<ul>
-<li>类的形式</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">myDecorator</span><span class="params">(object)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, fn)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__init__()"</span></span><br><span class="line">        self.fn = fn</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"inside myDecorator.__call__()"</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">@myDecorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aFunction</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"inside aFunction()"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">print</span> <span class="string">"Finished decorating aFunction()"</span></span><br><span class="line"> </span><br><span class="line">aFunction()</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 输出：</span></span><br><span class="line"><span class="comment"># inside myDecorator.__init__()</span></span><br><span class="line"><span class="comment"># Finished decorating aFunction()</span></span><br><span class="line"><span class="comment"># inside aFunction()</span></span><br><span class="line"><span class="comment"># inside myDecorator.__call__()</span></span><br></pre></td></tr></table></figure>
-<p>可以看出在构造装饰器装饰的函数时，执行<strong>init</strong>函数，在真正调用aFunction()函数时会调用<strong>call</strong>。</p>
-<p>看下重写上面的html.py的代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">makeHtmlTagClass</span><span class="params">(object)</span>:</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, tag, css_class=<span class="string">""</span>)</span>:</span></span><br><span class="line">        self._tag = tag</span><br><span class="line">        self._css_class = <span class="string">" class='&#123;0&#125;'"</span>.format(css_class) \</span><br><span class="line">                                       <span class="keyword">if</span> css_class !=<span class="string">""</span> <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, fn)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapped</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;"</span> + self._tag + self._css_class+<span class="string">"&gt;"</span>  \</span><br><span class="line">                       + fn(*args, **kwargs) + <span class="string">"&lt;/"</span> + self._tag + <span class="string">"&gt;"</span></span><br><span class="line">        <span class="keyword">return</span> wrapped</span><br><span class="line"> </span><br><span class="line"><span class="meta">@makeHtmlTagClass(tag="b", css_class="bold_css")</span></span><br><span class="line"><span class="meta">@makeHtmlTagClass(tag="i", css_class="italic_css")</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(name)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hello, &#123;&#125;"</span>.format(name)</span><br></pre></td></tr></table></figure>
-<p>注意参数的调用，如果decorator有参数的话，<strong>init</strong>()成员就不能传入fn了，而fn是在<strong>call</strong>的时候传入的。</p>
-<p>被decorator的函数其实已经是另外一个函数了，对于最前面那个hello.py的例子来说，如果你查询一下foo.<strong>name</strong>的话，你会发现其输出的是“wrapper”，而不是我们期望的“foo”，这会给我们的程序埋一些坑。所以，Python的functool包中提供了一个叫wrap的decorator来消除这样的副作用。所以就有了下面这种形式：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(fn)</span>:</span></span><br><span class="line"><span class="meta">    @wraps(fn)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">print</span> <span class="string">"hello, %s"</span> % fn.__name__</span><br><span class="line">        fn()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"goodby, %s"</span> % fn.__name__</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"> </span><br><span class="line"><span class="meta">@hello</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">'''foo help doc'''</span></span><br><span class="line">    <span class="keyword">print</span> <span class="string">"i am foo"</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"> </span><br><span class="line">foo()</span><br><span class="line"><span class="keyword">print</span> foo.__name__ <span class="comment">#输出 foo</span></span><br><span class="line"><span class="keyword">print</span> foo.__doc__  <span class="comment">#输出 foo help doc</span></span><br></pre></td></tr></table></figure>
-<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://coolshell.cn/articles/11265.html" target="_blank" rel="noopener">PYTHON修饰器的函数式编程</a></p>
-<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
-<p> <strong><em>END</em></strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2105,7 +2116,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">101</span>
+                <span class="site-state-item-count">102</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2173,7 +2184,7 @@
         <div class="copyright" >
   
   &copy;  2016 - 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

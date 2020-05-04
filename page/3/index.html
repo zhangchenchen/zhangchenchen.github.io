@@ -271,6 +271,202 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2017/11/17/kubernetes-integrate-with-ceph/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="pekingzcc">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Solar">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Solar" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/11/17/kubernetes-integrate-with-ceph/" itemprop="url">
+                  kubernetes-- kubernetes 使用ceph rbd作为持久存储
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-17T18:03:10+08:00">
+                2017-11-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/11/17/kubernetes-integrate-with-ceph/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/11/17/kubernetes-integrate-with-ceph/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="kubernetes-中的存储方案"><a href="#kubernetes-中的存储方案" class="headerlink" title="kubernetes 中的存储方案"></a>kubernetes 中的存储方案</h2><p>对于有状态服务，存储是一个至关重要的问题。k8s提供了非常丰富的组件来支持存储，这里大致列一下：</p>
+<ul>
+<li>volume: 就是直接挂载在pod上的组件，k8s中所有的其他存储组件都是通过volume来跟pod直接联系的。volume有个type属性，type决定了挂载的存储是什么，常见的比如：emptyDir，hostPath，nfs，rbd，以及下文要说的persistentVolumeClaim等。跟docker里面的volume概念不同的是，docker里的volume的生命周期是跟docker紧紧绑在一起的。这里根据type的不同，生命周期也不同，比如emptyDir类型的就是跟docker一样，pod挂掉，对应的volume也就消失了，而其他类型的都是永久存储。详细介绍可以参考<a href="https://kubernetes.io/docs/concepts/storage/volumes/" target="_blank" rel="noopener">Volumes</a></li>
+<li>Persistent Volumes：顾名思义，这个组件就是用来支持永久存储的，Persistent Volumes组件会抽象后端存储的提供者（也就是上文中volume中的type）和消费者（即具体哪个pod使用）。该组件提供了PersistentVolume和PersistentVolumeClaim两个概念来抽象上述两者。一个PersistentVolume（简称PV）就是后端存储提供的一块存储空间，具体到ceph rbd中就是一个image，一个PersistentVolumeClaim（简称PVC）可以看做是用户对PV的请求，PVC会跟某个PV绑定，然后某个具体pod会在volume 中挂载PVC,就挂载了对应的PV。关于更多详细信息比如PV,PVC的生命周期，dockerfile 格式等信息参考<a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank" rel="noopener">Persistent Volumes</a></li>
+<li>Dynamic Volume Provisioning: 动态volume发现，比如上面的Persistent Volumes,我们必须先要创建一个存储块，比如一个ceph中的image，然后将该image绑定PV，才能使用。这种静态的绑定模式太僵硬，每次申请存储都要向存储提供者索要一份存储快。Dynamic Volume Provisioning就是解决这个问题的。它引入了StorageClass这个概念，StorageClass抽象了存储提供者，只需在PVC中指定StorageClass，然后说明要多大的存储就可以了，存储提供者会根据需求动态创建所需存储快。甚至于，我们可以指定一个默认StorageClass，这样，只需创建PVC就可以了。</li>
+</ul>
+<h2 id="kubernetes-与ceph-整合"><a href="#kubernetes-与ceph-整合" class="headerlink" title="kubernetes 与ceph 整合"></a>kubernetes 与ceph 整合</h2><p>首先要有一个k8s集群，一个ceph集群，k8s集群的搭建与ceph集群的搭建不再赘述。</p>
+<h3 id="预备工作"><a href="#预备工作" class="headerlink" title="预备工作"></a>预备工作</h3><ul>
+<li><p>在每个k8s node中安装ceph-common</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y ceph-common</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将ceph配置文件ceph.conf,ceph admin的认证文件ceph.client.admin.keyring复制到k8s node的/etc/ceph/ 目录下。</p>
+</li>
+</ul>
+<h3 id="配置-ceph-secret"><a href="#配置-ceph-secret" class="headerlink" title="配置 ceph secret"></a>配置 ceph secret</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep key /etc/ceph/ceph.client.admin.keyring |awk <span class="string">'&#123;printf "%s", $NF&#125;'</span>|base64</span><br></pre></td></tr></table></figure>
+<p>获取base64加密的key：QVFCZmdTcFRBQUFBQUJBQWNXTmtsMEFtK1ZkTXVYU21nQ0FmMFE9PQ==<br>利用该key创建ceph-secret,这里我们单独创建了一个test-ceph namespace,所有操作都在该namespace下。<br>ceph-secret.yaml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">ceph-secret</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">"kubernetes.io/rbd"</span>  </span><br><span class="line"><span class="attr">data:</span></span><br><span class="line"><span class="attr">  key:</span> <span class="string">QVFCZmdTcFRBQUFBQUJBQWNXTmtsMEFtK1ZkTXVYU21nQ0FmMFE9PQ==</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="Persistent-Volumes-测试"><a href="#Persistent-Volumes-测试" class="headerlink" title="Persistent Volumes 测试"></a>Persistent Volumes 测试</h3><p>首先在ceph 中创建一个2G 的image，这里为了方便直接在rbd pool中创建。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd create <span class="built_in">test</span>-image -s 2G --image-feature  layering</span><br></pre></td></tr></table></figure>
+<p>查看新建image信息：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@seed galera-cluster]<span class="comment"># rbd info test-image</span></span><br><span class="line">rbd image <span class="string">'test-image'</span>:</span><br><span class="line">        size 2048 MB <span class="keyword">in</span> 512 objects</span><br><span class="line">        order 22 (4096 kB objects)</span><br><span class="line">        block_name_prefix: rbd_data.5ed8238e1f29</span><br><span class="line">        format: 2</span><br><span class="line">        features: layering</span><br><span class="line">        flags:</span><br></pre></td></tr></table></figure></p>
+<p>注：这里有个ceph的坑，在jewel版本下默认format是2，开启了rbd的一些属性，而这些属性有的内核版本是不支持的，会导致map不到device的情况，可以在创建时指定feature（我们就是这样做的）,也可以在ceph配置文件中关闭这些新属性：rbd_default_features = 2。参考<a href="http://www.zphj1987.com/2016/06/07/rbd%E6%97%A0%E6%B3%95map-rbd-feature-disable/" target="_blank" rel="noopener">rbd无法map(rbd feature disable)</a>。</p>
+<p>创建PV,需要指定ceph mon节点地址，以及对应的pool，image等：</p>
+<p>test.pv.yml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">PersistentVolume</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">test-pv</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  capacity:</span></span><br><span class="line"><span class="attr">    storage:</span> <span class="number">2</span><span class="string">Gi</span></span><br><span class="line"><span class="attr">  accessModes:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">ReadWriteOnce</span> </span><br><span class="line"><span class="attr">  rbd:</span></span><br><span class="line"><span class="attr">    monitors:</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">172.16</span><span class="number">.21</span><span class="number">.250</span><span class="string">:6789</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">172.16</span><span class="number">.21</span><span class="number">.251</span><span class="string">:6789</span></span><br><span class="line"><span class="bullet">      -</span> <span class="number">172.16</span><span class="number">.21</span><span class="number">.252</span><span class="string">:6789</span></span><br><span class="line"><span class="attr">    pool:</span> <span class="string">rbd</span></span><br><span class="line"><span class="attr">    image:</span> <span class="string">test-image</span></span><br><span class="line"><span class="attr">    user:</span> <span class="string">admin</span></span><br><span class="line"><span class="attr">    secretRef:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">ceph-secret</span></span><br><span class="line"><span class="attr">  persistentVolumeReclaimPolicy:</span> <span class="string">Recycle</span></span><br></pre></td></tr></table></figure></p>
+<p>创建PVC：</p>
+<p> test.pvc.yml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">PersistentVolumeClaim</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">test-pvc</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  accessModes:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">ReadWriteOnce</span></span><br><span class="line"><span class="attr">  resources:</span></span><br><span class="line"><span class="attr">    requests:</span></span><br><span class="line"><span class="attr">      storage:</span> <span class="number">2</span><span class="string">Gi</span></span><br></pre></td></tr></table></figure></p>
+<p>查看PV,PVC，如果状态是bound那么两者绑定成功。</p>
+<p>创建一个pod验证：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">nginx-dm</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">          image:</span> <span class="attr">nginx:alpine</span></span><br><span class="line"><span class="attr">          imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line"><span class="attr">          ports:</span></span><br><span class="line"><span class="attr">            - containerPort:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">          volumeMounts:</span></span><br><span class="line"><span class="attr">            - name:</span> <span class="string">ceph-rbd-volume</span></span><br><span class="line"><span class="attr">              mountPath:</span> <span class="string">"/usr/share/nginx/html"</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">ceph-rbd-volume</span></span><br><span class="line"><span class="attr">        persistentVolumeClaim:</span></span><br><span class="line"><span class="attr">          claimName:</span> <span class="string">test-pvc</span></span><br></pre></td></tr></table></figure>
+<p>进入该容器，利用dh -h 命令验证是否挂载成功。</p>
+<h3 id="Dynamic-Volume-Provisioning测试"><a href="#Dynamic-Volume-Provisioning测试" class="headerlink" title="Dynamic Volume Provisioning测试"></a>Dynamic Volume Provisioning测试</h3><p>创建一个storageclass：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">storage.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">StorageClass</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">   name:</span> <span class="string">ceph-storage</span></span><br><span class="line"><span class="attr">   namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">provisioner:</span> <span class="string">ceph.com/rbd</span></span><br><span class="line"><span class="attr">parameters:</span></span><br><span class="line"><span class="attr">  monitors:</span> <span class="number">172.16</span><span class="number">.21</span><span class="number">.250</span><span class="string">:6789,172.16.21.251:6789,172.16.21.252:6789</span></span><br><span class="line"><span class="attr">  adminId:</span> <span class="string">admin</span></span><br><span class="line"><span class="attr">  adminSecretName:</span> <span class="string">ceph-secret</span></span><br><span class="line"><span class="attr">  adminSecretNamespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">  pool:</span> <span class="string">rbd</span></span><br><span class="line"><span class="attr">  userId:</span> <span class="string">admin</span></span><br><span class="line"><span class="attr">  userSecretName:</span> <span class="string">ceph-secret</span></span><br></pre></td></tr></table></figure>
+<p>创建一个PVC，指定storageclass:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">PersistentVolumeClaim</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr"> name:</span> <span class="string">ceph-claim-dynamic</span></span><br><span class="line"><span class="attr"> namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr"> accessModes:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">ReadWriteOnce</span></span><br><span class="line"><span class="attr"> resources:</span></span><br><span class="line"><span class="attr">   requests:</span></span><br><span class="line"><span class="attr">     storage:</span> <span class="number">20</span><span class="string">Gi</span></span><br><span class="line"><span class="attr"> storageClassName:</span> <span class="string">ceph-storage</span></span><br></pre></td></tr></table></figure>
+<p>注：这里又趟到了一个大坑，如果这样就直接创建pod挂载的话会报错如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error creating rbd image: executable file not found <span class="keyword">in</span> <span class="variable">$PATH</span></span><br></pre></td></tr></table></figure></p>
+<p>这是因为我们的k8s集群是使用kubeadm创建的，k8s的几个服务也是跑在集群静态pod中，而kube-controller-manager组件会调用rbd的api，但是因为它的pod中没有安装rbd，所以会报错，如果是直接安装在物理机中，因为我们已经安装了ceph-common，所以不会出现这个问题。我们在该<a href="https://github.com/kubernetes/kubernetes/issues/38923" target="_blank" rel="noopener">issue</a>下找到了解决方案。如下：</p>
+<p>创建一个 rbd-provisioner ：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">rbd-provisioner</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">rbd-provisioner</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">rbd-provisioner</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">"quay.io/external_storage/rbd-provisioner:v0.1.0"</span></span><br><span class="line"><span class="attr">      serviceAccountName:</span> <span class="string">persistent-volume-binder</span></span><br></pre></td></tr></table></figure>
+<p>这样就可以直接用PVC了，创建 pod测试下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">extensions/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">nginx-test-dynamic</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">test-ceph</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">          image:</span> <span class="attr">nginx:alpine</span></span><br><span class="line"><span class="attr">          imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line"><span class="attr">          ports:</span></span><br><span class="line"><span class="attr">            - containerPort:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">          volumeMounts:</span></span><br><span class="line"><span class="attr">            - name:</span> <span class="string">ceph-rbd-volume</span></span><br><span class="line"><span class="attr">              mountPath:</span> <span class="string">"/usr/share/nginx/html"</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">ceph-rbd-dynamic-volume</span></span><br><span class="line"><span class="attr">        persistentVolumeClaim:</span></span><br><span class="line"><span class="attr">          claimName:</span> <span class="string">ceph-claim-dynamic</span></span><br></pre></td></tr></table></figure>
+<h3 id="实战：创建一个mysql-galera集群"><a href="#实战：创建一个mysql-galera集群" class="headerlink" title="实战：创建一个mysql-galera集群"></a>实战：创建一个mysql-galera集群</h3><p>在进入具体实战之前，先介绍一下k8s针对有状态服务推出的一个组件，statefulset(1.5之前叫做petset),statefulset与deployment,replicasets是一个级别的。不过Deployments和ReplicaSets是为无状态服务而设计。statefulset则是为了解决有状态服务的问题。它的应用场景如下：</p>
+<ul>
+<li>稳定的持久化存储，即Pod重新调度后还是能访问到相同的持久化数据，基于PVC来实现</li>
+<li>稳定的网络标志，即Pod重新调度后其PodName和HostName不变，基于Headless Service（即没有Cluster IP的Service）来实现。</li>
+<li>有序部署，有序扩展，即Pod是有顺序的，在部署或者扩展的时候要依据定义的顺序依次依次进行（即从0到N-1，在下一个Pod运行之前所有之前的Pod必须都是Running和Ready状态），基于init containers来实现。</li>
+<li>有序收缩，有序删除（即从N-1到0）。</li>
+</ul>
+<p>由应用场景可知，statefuleset特别适合mqsql,redis等数据库集群。相应的，一个statefuleset有以下三个部分：</p>
+<ul>
+<li>用于定义网络标志（DNS domain）的Headless Service</li>
+<li>用于创建PersistentVolumes的volumeClaimTemplates</li>
+<li>定义具体应用的StatefulSet</li>
+</ul>
+<p>以下是从github上找到的一个示例dockerfile:</p>
+<p>首先创建headless service：</p>
+<p>galera-service.yaml<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  annotations:</span></span><br><span class="line">    <span class="string">service.alpha.kubernetes.io/tolerate-unready-endpoints:</span> <span class="string">"true"</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">galera</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">galera</span></span><br><span class="line"><span class="attr">  labels:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  ports:</span></span><br><span class="line"><span class="attr">  - port:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">mysql</span></span><br><span class="line">  <span class="comment"># *.galear.default.svc.cluster.local</span></span><br><span class="line"><span class="attr">  clusterIP:</span> <span class="string">None</span></span><br><span class="line"><span class="attr">  selector:</span></span><br><span class="line"><span class="attr">    app:</span> <span class="string">mysql</span></span><br></pre></td></tr></table></figure></p>
+<p>创建statefulset，这里存储直接用的storageclass指定ceph rbd,镜像下载需要科学上网。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1beta1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">StatefulSet</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">  namespace:</span> <span class="string">galera</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line"><span class="attr">  serviceName:</span> <span class="string">"galera"</span></span><br><span class="line"><span class="attr">  replicas:</span> <span class="number">3</span></span><br><span class="line"><span class="attr">  template:</span></span><br><span class="line"><span class="attr">    metadata:</span></span><br><span class="line"><span class="attr">      labels:</span></span><br><span class="line"><span class="attr">        app:</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      initContainers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">install</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">gcr.io/google_containers/galera-install:0.1</span></span><br><span class="line"><span class="attr">        imagePullPolicy:</span> <span class="string">Always</span></span><br><span class="line"><span class="attr">        args:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">"--work-dir=/work-dir"</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">workdir</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/work-dir"</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">config</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/etc/mysql"</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">bootstrap</span></span><br><span class="line"><span class="attr">        image:</span> <span class="attr">debian:jessie</span></span><br><span class="line"><span class="attr">        command:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">"/work-dir/peer-finder"</span></span><br><span class="line"><span class="attr">        args:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="bullet">-on-start="/work-dir/on-start.sh"</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">"-service=galera"</span></span><br><span class="line"><span class="attr">        env:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">POD_NAMESPACE</span></span><br><span class="line"><span class="attr">          valueFrom:</span></span><br><span class="line"><span class="attr">            fieldRef:</span></span><br><span class="line"><span class="attr">              apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">              fieldPath:</span> <span class="string">metadata.namespace</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">workdir</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/work-dir"</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">config</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">"/etc/mysql"</span></span><br><span class="line"><span class="attr">      containers:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">        image:</span> <span class="string">gcr.io/google_containers/mysql-galera:e2e</span></span><br><span class="line"><span class="attr">        ports:</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">mysql</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">4444</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">sst</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">4567</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">replication</span></span><br><span class="line"><span class="attr">        - containerPort:</span> <span class="number">4568</span></span><br><span class="line"><span class="attr">          name:</span> <span class="string">ist</span></span><br><span class="line"><span class="attr">        args:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="bullet">--defaults-file=/etc/mysql/my-galera.cnf</span></span><br><span class="line"><span class="bullet">        -</span> <span class="bullet">--user=root</span></span><br><span class="line"><span class="attr">        readinessProbe:</span></span><br><span class="line">          <span class="comment"># <span class="doctag">TODO:</span> If docker exec is buggy just use gcr.io/google_containers/mysql-healthz:1.0</span></span><br><span class="line"><span class="attr">          exec:</span></span><br><span class="line"><span class="attr">            command:</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">sh</span></span><br><span class="line"><span class="bullet">            -</span> <span class="bullet">-c</span></span><br><span class="line"><span class="bullet">            -</span> <span class="string">"mysql -u root -e 'show databases;'"</span></span><br><span class="line"><span class="attr">          initialDelaySeconds:</span> <span class="number">15</span></span><br><span class="line"><span class="attr">          timeoutSeconds:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">          successThreshold:</span> <span class="number">2</span></span><br><span class="line"><span class="attr">        volumeMounts:</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">datadir</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/var/lib/</span></span><br><span class="line"><span class="attr">        - name:</span> <span class="string">config</span></span><br><span class="line"><span class="attr">          mountPath:</span> <span class="string">/etc/mysql</span></span><br><span class="line"><span class="attr">      volumes:</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">config</span></span><br><span class="line"><span class="attr">        emptyDir:</span> <span class="string">&#123;&#125;</span></span><br><span class="line"><span class="attr">      - name:</span> <span class="string">workdir</span></span><br><span class="line"><span class="attr">        emptyDir:</span> <span class="string">&#123;&#125;</span></span><br><span class="line"><span class="attr">  volumeClaimTemplates:</span></span><br><span class="line"><span class="attr">  - metadata:</span></span><br><span class="line"><span class="attr">      name:</span> <span class="string">datadir</span></span><br><span class="line"><span class="attr">      annotations:</span></span><br><span class="line">        <span class="string">volume.beta.kubernetes.io/storage-class:</span> <span class="string">"ceph-web"</span></span><br><span class="line"><span class="attr">    spec:</span></span><br><span class="line"><span class="attr">      accessModes:</span> <span class="string">[</span> <span class="string">"ReadWriteOnce"</span> <span class="string">]</span></span><br><span class="line"><span class="attr">      resources:</span></span><br><span class="line"><span class="attr">        requests:</span></span><br><span class="line"><span class="attr">          storage:</span> <span class="number">1</span><span class="string">Gi</span></span><br></pre></td></tr></table></figure>
+<p>以上涉及到三个镜像，前两个镜像在initContainers 下，表示这两个镜像创建的是Init Container，顾名思义，就是完成一些初始化的工作。这些 Init Container 按照定义的顺序依次执行，只有所有的Init Container 执行完后，主容器才启动。由于一个Pod里的存储卷是共享的，所以 Init Container 里产生的数据可以被主容器使用到。<br>这里两个initcontainer主要完成以下两个工作：安装mysql-galera等组件,生成配置文件等。</p>
+<p>最终结果如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@seed galera-cluster]<span class="comment"># kubectl get pods  -n galera</span></span><br><span class="line">NAME                             READY     STATUS    RESTARTS   AGE</span><br><span class="line">mysql-0                          1/1       Running   0          47m</span><br><span class="line">mysql-1                          1/1       Running   0          24m</span><br><span class="line">mysql-2                          1/1       Running   0          2m</span><br></pre></td></tr></table></figure>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://jicki.me/2017/05/09/kubernetes-ceph-rbd/#ceph-mon-" target="_blank" rel="noopener">kubernetes Ceph RBD</a></p>
+<p><a href="http://blog.kubernetes.io/2017/03/dynamic-provisioning-and-storage-classes-kubernetes.html" target="_blank" rel="noopener">Dynamic Provisioning and Storage Classes in Kubernetes</a></p>
+<p><a href="http://tonybai.com/2016/11/07/integrate-kubernetes-with-ceph-rbd/" target="_blank" rel="noopener">使用Ceph RBD为Kubernetes集群提供存储卷</a></p>
+<p><a href="https://jimmysong.io/kubernetes-handbook/practice/using-ceph-for-persistent-storage.html" target="_blank" rel="noopener">使用Ceph做持久化存储创建MySQL集群</a></p>
+<p><a href="https://github.com/kubernetes/kubernetes/issues/38923" target="_blank" rel="noopener">Error creating rbd image: executable file not found in $PATH </a></p>
+<p><a href="https://severalnines.com/blog/mysql-docker-running-galera-cluster-kubernetes" target="_blank" rel="noopener">MySQL on Docker: Running Galera Cluster on Kubernetes</a></p>
+<p><a href="https://jimmysong.io/kubernetes-handbook/concepts/statefulset.html" target="_blank" rel="noopener">StatefulSet</a></p>
+<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
+<p> <strong><em>END</em></strong></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2017/11/09/kubernetes-monitoring-guide-2/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1894,155 +2090,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="https://zhangchenchen.github.io/2017/08/08/openstack-resource-segeration/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="pekingzcc">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Solar">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Solar" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/08/08/openstack-resource-segeration/" itemprop="url">
-                  Openstack-- openstack 中的资源分离策略
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-08T13:54:20+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/08/08/openstack-resource-segeration/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/08/08/openstack-resource-segeration/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="为什么做资源的分离"><a href="#为什么做资源的分离" class="headerlink" title="为什么做资源的分离"></a>为什么做资源的分离</h2><p>openstack 作为一个云计算框架，需要统筹计算，存储，网络等资源，本身就已经够复杂了。如果是在一个非常大的环境中，节点众多，且复杂多样，这个时候就有必要根据这些节点的差异做一些逻辑上的分离，以达到不同资源的区分，这样，做水平扩展的时候也可以根据这个逻辑分区针对性的进行扩展。</p>
-<h2 id="openstack-中的资源分离策略"><a href="#openstack-中的资源分离策略" class="headerlink" title="openstack 中的资源分离策略"></a>openstack 中的资源分离策略</h2><p>openstack 的资源分离策略一定程度上借鉴了AWS的策略，整体来说，如下：</p>
-<p><img src="https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-08-rc-se.png" alt="resource-segeration"></p>
-<h3 id="Infrastructure-segregation"><a href="#Infrastructure-segregation" class="headerlink" title="Infrastructure segregation"></a>Infrastructure segregation</h3><p>主要是理解Regions, cells, Host aggregates, Availability zones这几个概念。</p>
-<ul>
-<li>Regions:借鉴自AWS，更像是一个地理上的概念（比如北京的数据中心可以作为一个region,南京的数据中心作为另一个region），每个region有自己独立的endpoint，regions之间完全隔离，不同regions之间可以共享keystone/dashboard。openstack默认新建一个region，即RegionOne，如果还想建立第二个Region，可以利用 keystone endpoint­create 命令添加。<br><img src="https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2017-08-08-region1.png" alt="region"></li>
-</ul>
-<ul>
-<li>Cells:cell主要是为了解决openstack 的扩展性以及规模瓶颈而引进的概念。当openstack达到一定规模后，依赖比较强的database以及AMQP便成为整个系统的瓶颈，引入cell后，每个cell有自己独立的database和AMQP。公司云平台只是一个小云，没有引入，所以不去深究。cell目前是有v1，v2两版，实现方式差异比较大，感兴趣可以参考<a href="https://www.ustack.com/news/what-is-nova-cells-v2/?utm_source=tuicool&amp;utm_medium=referral" target="_blank" rel="noopener">Nova Cells V2如何帮助OpenStack集群突破性能瓶颈？</a>。</li>
-<li>Host aggregates &amp;&amp; Availability zones：这两个概念有共通点，且要相互配合使用，都用来表示一组节点的集合，简单说，AZ(Availability zone)是一个面向用户的概念，(这里只讨论nova 范畴的AZ,cinder,neutron也有对应的AZ概念),AZ一般依据地址，网络部署或电力配置划分，可以是一个独立的机房，或者一个独立供电的机架等，用户在创建instance的时候可以指定AZ，从而使instance创建在指定的AZ中，而host aggregate是一个面向管理员的概念，主要用来给nova-scheduler调度使用，比如根据某一属性（例如含有固态硬盘）划分一个host aggregate，把所有含有固态硬盘的host都放到该host aggregate中，nova-scheduler调度时指定相关属性就可以调度到对应host aggregate中的host。</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/zhangchenchen/zhangchenchen.github.io/hexo/images/2018-08-08-az.png" alt="AZandHG"><br>如上图，有两个地理隔离的Region，四个AZ，以及若干个根据不同属性区分的host aggregate。host aggregate 创建的时候可以指定AZ（如果AZ没有就会自动创建一个AZ），一个host可以属于多个host aggregate，但只能属于一个AZ。如下为一个示例：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nova aggregate­create storage­optimized storage­optimized-AZ  <span class="comment"># 创建一个host aggregate</span></span><br><span class="line">nova aggregate­<span class="built_in">set</span>­metadata <span class="variable">$aggregateID</span> fast­storage=<span class="literal">true</span> <span class="comment"># 设置 aggregate 的metadate</span></span><br><span class="line">nova aggregate­add­host <span class="variable">$aggregateID</span> host­1 <span class="comment">#添加host到aggregate</span></span><br><span class="line">nova flavor­key <span class="variable">$flavorID</span> <span class="built_in">set</span> fast­storage=<span class="literal">true</span> <span class="comment">#添加flavor的 条件</span></span><br></pre></td></tr></table></figure>
-<h3 id="Workload-segregation"><a href="#Workload-segregation" class="headerlink" title="Workload segregation"></a>Workload segregation</h3><p>负载这一块的策略是基于server-group来做的，相对比较简单。注意，这里的server-group不再是host的集合，而是instance的集合。比如，我要创建3个instance，因为这3个instance都比较吃内存，所以想要这3个instance在不同的host上，就可以这样做：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">nova server-group-create --policy anti-affinity group-1 <span class="comment"># 创建server-group，注意policy指定策略是不在同一节点</span></span><br><span class="line">nova boot --image IMAGE_ID --flavor 1 --hint group=group-1 inst1 <span class="comment">#创建instance1 </span></span><br><span class="line">nova boot --image IMAGE_ID --flavor 1 --hint group=group-1 inst2 <span class="comment">#创建instance2 </span></span><br><span class="line">nova boot --image IMAGE_ID --flavor 1 --hint group=group-1 inst3 <span class="comment">#创建instance3</span></span><br></pre></td></tr></table></figure>
-<p>在nova配置文件中指定scheduler策略，有一个针对server-group的filter叫做ServerGroupAntiAffinityFilter。除了anti-affinity，还有 affinity策略，就是尽量让同一server-group的instance在同一个host上。</p>
-<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://www.jianshu.com/p/613d34ad6d51" target="_blank" rel="noopener">理解openstack中region、cell、availability zone、host aggregate 概念</a></p>
-<p><a href="http://happylab.blog.51cto.com/1730296/1739180" target="_blank" rel="noopener">openstack运维实战系列(十二)之nova aggregate资源分组</a></p>
-<p><a href="https://www.openstack.org/assets/presentation-media/divideandconquer-2.pdf" target="_blank" rel="noopener">DIVIDE AND CONQUER:RESOURCE SEGREGATION IN THE OPENSTACK<br>CLOUD</a></p>
-<p><strong><em>本篇文章由<a href="https://zhangchenchen.github.io/">pekingzcc</a>采用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可,转载请注明。</em></strong></p>
-<p> <strong><em>END</em></strong></p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2090,7 +2137,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">101</span>
+                <span class="site-state-item-count">102</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2158,7 +2205,7 @@
         <div class="copyright" >
   
   &copy;  2016 - 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
